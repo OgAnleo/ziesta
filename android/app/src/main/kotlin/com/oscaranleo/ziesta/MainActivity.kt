@@ -11,6 +11,7 @@ class MainActivity : FlutterActivity() {
             .setMethodCallHandler { call, result ->
                 when (call.method) {
                     "ping" -> result.success("pong")
+                    "pauseMedia" -> result.success(MediaPauser.pause(this))
                     else -> result.notImplemented()
                 }
             }
