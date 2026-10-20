@@ -1,5 +1,6 @@
 // ignore: unused_import
 import 'package:intl/intl.dart' as intl;
+
 import 'app_localizations.dart';
 
 // ignore_for_file: type=lint
@@ -29,7 +30,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get permissionTitle => 'Permiso necesario';
 
   @override
-  String get permissionMessage => 'Para pausar el audio a la hora exacta, Ziesta necesita el permiso «Alarmas y recordatorios». Actívalo en la pantalla que se abrirá y vuelve a pulsar Iniciar.';
+  String get permissionMessage =>
+      'Para pausar el audio a la hora exacta, Ziesta necesita el permiso «Alarmas y recordatorios». Actívalo en la pantalla que se abrirá y vuelve a pulsar Iniciar.';
 
   @override
   String get openSettings => 'Abrir ajustes';
