@@ -8,17 +8,28 @@ import android.os.Build
 
 object TimerScheduler {
     const val EXTEND_MILLIS = 15 * 60_000L
+    const val FADE_MILLIS = 60_000L
 
-    private fun pending(context: Context): PendingIntent =
+    private const val FLAGS =
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+
+    private fun endIntent(context: Context): PendingIntent =
         PendingIntent.getBroadcast(
-            context,
-            0,
-            Intent(context, TimerReceiver::class.java),
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            context, 0, Intent(context, TimerReceiver::class.java), FLAGS
+        )
+
+    private fun fadeIntent(context: Context): PendingIntent =
+        PendingIntent.getForegroundService(
+            context, 1, Intent(context, FadeService::class.java), FLAGS
         )
 
     private fun alarmManager(context: Context): AlarmManager =
         context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+    private fun stopFade(context: Context) {
+        context.stopService(Intent(context, FadeService::class.java))
+        VolumeFader.restore(context)
+    }
 
     fun canSchedule(context: Context): Boolean =
         Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
@@ -26,11 +37,22 @@ object TimerScheduler {
 
     fun schedule(context: Context, endMillis: Long): Boolean {
         if (!canSchedule(context)) return false
-        alarmManager(context).setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            endMillis,
-            pending(context)
+        stopFade(context)
+        val alarms = alarmManager(context)
+
+        alarms.setExactAndAllowWhileIdle(
+            AlarmManager.RTC_WAKEUP, endMillis, endIntent(context)
         )
+
+        val fadeAt = endMillis - FADE_MILLIS
+        if (fadeAt > System.currentTimeMillis()) {
+            alarms.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP, fadeAt, fadeIntent(context)
+            )
+        } else {
+            alarms.cancel(fadeIntent(context))
+        }
+
         TimerStore.saveEnd(context, endMillis)
         TimerNotification.show(context, endMillis)
         return true
@@ -44,7 +66,10 @@ object TimerScheduler {
     }
 
     fun cancel(context: Context) {
-        alarmManager(context).cancel(pending(context))
+        stopFade(context)
+        val alarms = alarmManager(context)
+        alarms.cancel(endIntent(context))
+        alarms.cancel(fadeIntent(context))
         TimerStore.clear(context)
         TimerNotification.hide(context)
     }

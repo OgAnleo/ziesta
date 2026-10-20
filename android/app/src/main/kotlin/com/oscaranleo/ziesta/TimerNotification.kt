@@ -12,11 +12,12 @@ object TimerNotification {
     private const val CHANNEL_ID = "ziesta_timer"
     private const val OLD_CHANNEL_ID = "ziesta_warning"
     const val NOTIFICATION_ID = 1
+    const val FADE_NOTIFICATION_ID = 2
 
     private const val FLAGS =
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
 
-    fun show(context: Context, endMillis: Long) {
+    fun build(context: Context, endMillis: Long): Notification {
         val manager = context.getSystemService(NotificationManager::class.java)
         manager.deleteNotificationChannel(OLD_CHANNEL_ID)
         manager.createNotificationChannel(
@@ -31,7 +32,7 @@ object TimerNotification {
             context, 0, Intent(context, MainActivity::class.java), FLAGS
         )
 
-        val notification = Notification.Builder(context, CHANNEL_ID)
+        return Notification.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_stat_moon)
             .setContentTitle(context.getString(R.string.notification_title))
             .setContentText(context.getString(R.string.notification_text))
@@ -46,13 +47,17 @@ object TimerNotification {
             .addAction(action(context, R.string.action_extend, 2, ExtendReceiver::class.java))
             .addAction(action(context, R.string.action_cancel, 3, CancelReceiver::class.java))
             .build()
+    }
 
-        manager.notify(NOTIFICATION_ID, notification)
+    fun show(context: Context, endMillis: Long) {
+        context.getSystemService(NotificationManager::class.java)
+            .notify(NOTIFICATION_ID, build(context, endMillis))
     }
 
     fun hide(context: Context) {
-        context.getSystemService(NotificationManager::class.java)
-            .cancel(NOTIFICATION_ID)
+        val manager = context.getSystemService(NotificationManager::class.java)
+        manager.cancel(NOTIFICATION_ID)
+        manager.cancel(FADE_NOTIFICATION_ID)
     }
 
     private fun action(
