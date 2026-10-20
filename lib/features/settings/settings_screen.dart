@@ -23,10 +23,6 @@ class SettingsScreen extends ConsumerWidget {
           SegmentedButton<ThemeMode>(
             segments: [
               ButtonSegment(
-                value: ThemeMode.system,
-                label: Text(l10n.themeSystem),
-              ),
-              ButtonSegment(
                 value: ThemeMode.light,
                 label: Text(l10n.themeLight),
               ),

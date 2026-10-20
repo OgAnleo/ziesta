@@ -14,10 +14,7 @@ class ThemeModeNotifier extends Notifier<ThemeMode> {
   @override
   ThemeMode build() {
     final name = ref.read(sharedPreferencesProvider).getString(_key);
-    return ThemeMode.values.firstWhere(
-      (mode) => mode.name == name,
-      orElse: () => ThemeMode.system,
-    );
+    return name == ThemeMode.light.name ? ThemeMode.light : ThemeMode.dark;
   }
 
   Future<void> set(ThemeMode mode) async {
