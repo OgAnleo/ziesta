@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ziesta/features/timer/timer_notifier.dart';
 import 'package:ziesta/l10n/app_localizations.dart';
 import 'package:ziesta/features/settings/settings_screen.dart';
+import 'package:ziesta/features/settings/settings_notifier.dart';
 
 class TimerScreen extends ConsumerStatefulWidget {
   const TimerScreen({super.key});
@@ -13,13 +14,13 @@ class TimerScreen extends ConsumerStatefulWidget {
 }
 
 class _TimerScreenState extends ConsumerState<TimerScreen> {
-  static const _maxMinutes = 180;
-  int _minutes = 30;
+  late int _minutes;
   late final FixedExtentScrollController _controller;
 
   @override
   void initState() {
     super.initState();
+    _minutes = ref.read(defaultMinutesProvider);
     _controller = FixedExtentScrollController(initialItem: _minutes - 1);
   }
 
@@ -58,7 +59,9 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
     final l10n = AppLocalizations.of(context)!;
     final textTheme = Theme.of(context).textTheme;
     final remaining = ref.watch(remainingProvider).value;
-
+    ref.listen(defaultMinutesProvider, (_, minutes) {
+      _controller.jumpToItem(minutes - 1);
+    });
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.appTitle),
@@ -102,7 +105,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
                           onSelectedItemChanged: (index) =>
                               setState(() => _minutes = index + 1),
                           children: [
-                            for (var m = 1; m <= _maxMinutes; m++)
+                            for (var m = 1; m <= maxMinutes; m++)
                               Center(
                                 child: Text(
                                   '$m',

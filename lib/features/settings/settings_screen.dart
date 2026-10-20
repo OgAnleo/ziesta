@@ -9,14 +9,16 @@ class SettingsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
+    final textTheme = Theme.of(context).textTheme;
     final themeMode = ref.watch(themeModeProvider);
+    final defaultMinutes = ref.watch(defaultMinutesProvider);
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.settings)),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          Text(l10n.theme, style: Theme.of(context).textTheme.titleMedium),
+          Text(l10n.theme, style: textTheme.titleMedium),
           const SizedBox(height: 12),
           SegmentedButton<ThemeMode>(
             segments: [
@@ -33,6 +35,17 @@ class SettingsScreen extends ConsumerWidget {
             selected: {themeMode},
             onSelectionChanged: (selection) =>
                 ref.read(themeModeProvider.notifier).set(selection.first),
+          ),
+          const SizedBox(height: 32),
+          Text(l10n.defaultDuration, style: textTheme.titleMedium),
+          Slider(
+            min: 1,
+            max: maxMinutes.toDouble(),
+            divisions: maxMinutes - 1,
+            value: defaultMinutes.toDouble(),
+            label: l10n.minutesButton(defaultMinutes),
+            onChanged: (value) =>
+                ref.read(defaultMinutesProvider.notifier).set(value.round()),
           ),
         ],
       ),

@@ -17,5 +17,6 @@
   "theme": "Theme",
   "themeSystem": "System",
   "themeLight": "Light",
-  "themeDark": "Dark"
+  "themeDark": "Dark",
+  "defaultDuration": "Default duration"
 }

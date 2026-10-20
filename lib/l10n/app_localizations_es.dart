@@ -48,4 +48,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get themeDark => 'Oscuro';
+
+  @override
+  String get defaultDuration => 'Duración por defecto';
 }
