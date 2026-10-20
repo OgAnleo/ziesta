@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Build
 
 object TimerScheduler {
+    const val EXTEND_MILLIS = 1 * 60_000L
     private const val WARNING_MILLIS = 60_000L
 
     private fun pending(
@@ -46,12 +47,22 @@ object TimerScheduler {
                 pending(context, 1, WarningReceiver::class.java)
             )
         }
+
+        TimerStore.saveEnd(context, endMillis)
         return true
+    }
+
+    fun extend(context: Context, extraMillis: Long): Long? {
+        val end = TimerStore.getEnd(context) ?: return null
+        if (end <= System.currentTimeMillis()) return null
+        val newEnd = end + extraMillis
+        return if (schedule(context, newEnd)) newEnd else null
     }
 
     fun cancel(context: Context) {
         val alarms = alarmManager(context)
         alarms.cancel(pending(context, 0, TimerReceiver::class.java))
         alarms.cancel(pending(context, 1, WarningReceiver::class.java))
+        TimerStore.clear(context)
     }
 }

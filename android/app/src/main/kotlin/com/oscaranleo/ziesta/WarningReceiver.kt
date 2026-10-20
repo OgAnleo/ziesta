@@ -1,5 +1,6 @@
 package com.oscaranleo.ziesta
 
+import android.graphics.drawable.Icon
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -25,6 +26,17 @@ class WarningReceiver : BroadcastReceiver() {
             Intent(context, MainActivity::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
+        val extendIntent = PendingIntent.getBroadcast(
+            context,
+            2,
+            Intent(context, ExtendReceiver::class.java),
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+        val extendAction = Notification.Action.Builder(
+            Icon.createWithResource(context, R.drawable.ic_stat_moon),
+            context.getString(R.string.action_extend),
+            extendIntent
+        ).build()
 
         val notification = Notification.Builder(context, CHANNEL_ID)
            .setSmallIcon(R.drawable.ic_stat_moon)
@@ -32,6 +44,7 @@ class WarningReceiver : BroadcastReceiver() {
             .setContentText(context.getString(R.string.warning_text))
             .setContentIntent(openApp)
             .setAutoCancel(true)
+            .addAction(extendAction)
             .build()
 
         manager.notify(NOTIFICATION_ID, notification)

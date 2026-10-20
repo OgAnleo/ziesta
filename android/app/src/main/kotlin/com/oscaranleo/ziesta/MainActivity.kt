@@ -39,6 +39,11 @@ class MainActivity : FlutterActivity() {
                         }
                         result.success(null)
                     }
+                    
+                    "getEnd" -> result.success(
+                        TimerStore.getEnd(this)?.takeIf { it > System.currentTimeMillis() }
+                 )
+
                     "requestNotificationPermission" -> {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
                             checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) !=
