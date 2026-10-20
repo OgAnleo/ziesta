@@ -7,7 +7,7 @@ after the time you choose, so you never wake up with a video still playing.
 ![Countdown](docs/screenshots/countDown.png)
 ![Settings](docs/screenshots/settings.png)
 
-a## Features
+## Features
 
 - Pick the time with a wheel (1-180 minutes) or one of the quick buttons: 10, 20, 30 and 60 minutes.
 - Works with the screen off and with the app closed.
