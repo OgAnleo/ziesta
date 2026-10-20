@@ -4,8 +4,9 @@ A sleep timer for Android that **pauses the audio of other apps** (YouTube, Twit
 after the time you choose, so you never wake up with a video still playing.
 
 ![Main screen](docs/screenshots/main.png)
+![Countdown](docs/screenshots/countDown.png)
 ![Settings](docs/screenshots/settings.png)
-![Countdown](docs/screenshots/countdown.png)
+
 a## Features
 
 - Pick the time with a wheel (1-180 minutes) or one of the quick buttons: 10, 20, 30 and 60 minutes.
