@@ -7,11 +7,17 @@ import android.content.Intent
 import android.os.Build
 
 object TimerScheduler {
-    private fun pending(context: Context): PendingIntent =
+    private const val WARNING_MILLIS = 60_000L
+
+    private fun pending(
+        context: Context,
+        requestCode: Int,
+        receiver: Class<*>
+    ): PendingIntent =
         PendingIntent.getBroadcast(
             context,
-            0,
-            Intent(context, TimerReceiver::class.java),
+            requestCode,
+            Intent(context, receiver),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -24,15 +30,28 @@ object TimerScheduler {
 
     fun schedule(context: Context, endMillis: Long): Boolean {
         if (!canSchedule(context)) return false
-        alarmManager(context).setExactAndAllowWhileIdle(
+        val alarms = alarmManager(context)
+
+        alarms.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             endMillis,
-            pending(context)
+            pending(context, 0, TimerReceiver::class.java)
         )
+
+        val warningAt = endMillis - WARNING_MILLIS
+        if (warningAt > System.currentTimeMillis()) {
+            alarms.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                warningAt,
+                pending(context, 1, WarningReceiver::class.java)
+            )
+        }
         return true
     }
 
     fun cancel(context: Context) {
-        alarmManager(context).cancel(pending(context))
+        val alarms = alarmManager(context)
+        alarms.cancel(pending(context, 0, TimerReceiver::class.java))
+        alarms.cancel(pending(context, 1, WarningReceiver::class.java))
     }
 }

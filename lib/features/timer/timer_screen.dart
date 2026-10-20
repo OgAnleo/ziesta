@@ -123,7 +123,14 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
                       final ok = await ref
                           .read(timerEndProvider.notifier)
                           .start(Duration(minutes: _minutes));
-                      if (!ok && mounted) _showPermissionDialog();
+                      if (!mounted) return;
+                      if (ok) {
+                        ref
+                            .read(audioChannelProvider)
+                            .requestNotificationPermission();
+                      } else {
+                        _showPermissionDialog();
+                      }
                     },
                     child: Text(l10n.startTimer),
                   ),

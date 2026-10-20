@@ -4,10 +4,14 @@ class AudioChannel {
   static const _channel = MethodChannel('ziesta/audio');
 
   Future<String?> ping() => _channel.invokeMethod<String>('ping');
+
   Future<bool> pauseMedia() async {
     final ok = await _channel.invokeMethod<bool>('pauseMedia');
     return ok ?? false;
   }
+
+  Future<void> requestNotificationPermission() =>
+      _channel.invokeMethod<void>('requestNotificationPermission');
 
   Future<bool> scheduleTimer(DateTime end) async {
     final ok = await _channel.invokeMethod<bool>('scheduleTimer', {

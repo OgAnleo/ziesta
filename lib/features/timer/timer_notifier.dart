@@ -6,6 +6,7 @@ final audioChannelProvider = Provider((ref) => AudioChannel());
 final timerEndProvider = NotifierProvider<TimerEndNotifier, DateTime?>(
   TimerEndNotifier.new,
 );
+
 final remainingProvider = StreamProvider<Duration?>((ref) async* {
   final end = ref.watch(timerEndProvider);
   if (end == null) {

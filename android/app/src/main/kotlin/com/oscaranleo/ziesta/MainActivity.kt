@@ -7,6 +7,9 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.Manifest
+import android.content.pm.PackageManager
+
 
 class MainActivity : FlutterActivity() {
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -36,6 +39,15 @@ class MainActivity : FlutterActivity() {
                             )
                         }
                         result.success(null)
+                    }
+                    "requestNotificationPermission" -> {
+                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                           checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) !=
+                         PackageManager.PERMISSION_GRANTED
+                         ) {
+                        requestPermissions(arrayOf(Manifest.permission.POST_NOTIFICATIONS), 0)
+                          }
+                            result.success(null)
                     }
                     else -> result.notImplemented()
                 }
