@@ -5,24 +5,7 @@ import 'package:ziesta/core/audio_channel.dart';
 import 'package:ziesta/core/preferences_provider.dart';
 import 'package:ziesta/features/timer/timer_notifier.dart';
 
-class FakeAudioChannel extends Fake implements AudioChannel {
-  bool canSchedule = true;
-  int scheduleCalls = 0;
-  int cancelCalls = 0;
-  DateTime? lastEnd;
-
-  @override
-  Future<bool> scheduleTimer(DateTime end) async {
-    scheduleCalls++;
-    lastEnd = end;
-    return canSchedule;
-  }
-
-  @override
-  Future<void> cancelTimer() async {
-    cancelCalls++;
-  }
-}
+import 'helpers/fake_audio_channel.dart';
 
 ProviderContainer makeContainer(SharedPreferences prefs, AudioChannel fake) {
   final container = ProviderContainer(
