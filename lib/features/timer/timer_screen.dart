@@ -30,6 +30,15 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
     super.dispose();
   }
 
+  Widget _preset(AppLocalizations l10n, int minutes) => OutlinedButton(
+    onPressed: () => _controller.animateToItem(
+      minutes - 1,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    ),
+    child: Text(l10n.minutesButton(minutes)),
+  );
+
   Future<void> _showPermissionDialog() {
     final l10n = AppLocalizations.of(context)!;
     return showDialog<void>(
@@ -119,18 +128,18 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  Wrap(
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
                     spacing: 12,
                     children: [
-                      for (final m in [10, 20, 30, 60])
-                        OutlinedButton(
-                          onPressed: () => _controller.animateToItem(
-                            m - 1,
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeOut,
-                          ),
-                          child: Text(l10n.minutesButton(m)),
-                        ),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        spacing: 12,
+                        children: [
+                          for (final m in [10, 20, 30]) _preset(l10n, m),
+                        ],
+                      ),
+                      _preset(l10n, 60),
                     ],
                   ),
                   const SizedBox(height: 32),
