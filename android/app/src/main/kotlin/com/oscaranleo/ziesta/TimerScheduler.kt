@@ -7,7 +7,7 @@ import android.content.Intent
 import android.os.Build
 
 object TimerScheduler {
-    const val EXTEND_MILLIS = 1 * 60_000L
+    const val EXTEND_MILLIS = 15 * 60_000L
     private const val WARNING_MILLIS = 60_000L
 
     private fun pending(

@@ -1,17 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:ziesta/core/audio_channel.dart';
-import 'package:ziesta/core/preferences_provider.dart';
 import 'package:ziesta/features/timer/timer_notifier.dart';
 
 import 'helpers/fake_audio_channel.dart';
 
-ProviderContainer makeContainer(SharedPreferences prefs, AudioChannel fake) {
+ProviderContainer makeContainer(FakeAudioChannel fake, {DateTime? initialEnd}) {
   final container = ProviderContainer(
     overrides: [
-      sharedPreferencesProvider.overrideWithValue(prefs),
       audioChannelProvider.overrideWithValue(fake),
+      initialTimerEndProvider.overrideWithValue(initialEnd),
     ],
   );
   addTearDown(container.dispose);
@@ -25,18 +22,14 @@ void main() {
     fake = FakeAudioChannel();
   });
 
-  test('starts with no timer when nothing is saved', () async {
-    SharedPreferences.setMockInitialValues({});
-    final prefs = await SharedPreferences.getInstance();
-    final container = makeContainer(prefs, fake);
+  test('starts with no timer', () {
+    final container = makeContainer(fake);
 
     expect(container.read(timerEndProvider), isNull);
   });
 
-  test('start schedules the alarm and saves the end time', () async {
-    SharedPreferences.setMockInitialValues({});
-    final prefs = await SharedPreferences.getInstance();
-    final container = makeContainer(prefs, fake);
+  test('start schedules the alarm and updates the state', () async {
+    final container = makeContainer(fake);
 
     final before = DateTime.now();
     final ok = await container
@@ -48,14 +41,11 @@ void main() {
     expect(end, isNotNull);
     expect(end!.difference(before).inMinutes, 30);
     expect(fake.scheduleCalls, 1);
-    expect(fake.lastEnd, end);
-    expect(prefs.getInt('timer_end'), end.millisecondsSinceEpoch);
+    expect(fake.nativeEnd, end);
   });
 
   test('start does nothing when the alarm permission is missing', () async {
-    SharedPreferences.setMockInitialValues({});
-    final prefs = await SharedPreferences.getInstance();
-    final container = makeContainer(prefs, fake);
+    final container = makeContainer(fake);
     fake.canSchedule = false;
 
     final ok = await container
@@ -64,13 +54,11 @@ void main() {
 
     expect(ok, isFalse);
     expect(container.read(timerEndProvider), isNull);
-    expect(prefs.getInt('timer_end'), isNull);
+    expect(fake.nativeEnd, isNull);
   });
 
-  test('cancel clears the state and the saved time', () async {
-    SharedPreferences.setMockInitialValues({});
-    final prefs = await SharedPreferences.getInstance();
-    final container = makeContainer(prefs, fake);
+  test('cancel clears the state and the native alarm', () async {
+    final container = makeContainer(fake);
     final notifier = container.read(timerEndProvider.notifier);
 
     await notifier.start(const Duration(minutes: 30));
@@ -78,32 +66,39 @@ void main() {
 
     expect(container.read(timerEndProvider), isNull);
     expect(fake.cancelCalls, 1);
-    expect(prefs.getInt('timer_end'), isNull);
+    expect(fake.nativeEnd, isNull);
   });
 
-  test('recovers a saved end time that is still in the future', () async {
-    final future = DateTime.now().add(const Duration(minutes: 10));
-    SharedPreferences.setMockInitialValues({
-      'timer_end': future.millisecondsSinceEpoch,
-    });
-    final prefs = await SharedPreferences.getInstance();
-    final container = makeContainer(prefs, fake);
+  test('starts from the end time found by the native side', () {
+    final end = DateTime.now().add(const Duration(minutes: 10));
+    final container = makeContainer(fake, initialEnd: end);
+
+    expect(container.read(timerEndProvider), end);
+  });
+
+  test('refresh picks up an extension made from the notification', () async {
+    final container = makeContainer(fake);
+    final notifier = container.read(timerEndProvider.notifier);
+    await notifier.start(const Duration(minutes: 30));
+
+    final extended = fake.nativeEnd!.add(const Duration(minutes: 15));
+    fake.nativeEnd = extended;
+    await notifier.refresh();
 
     expect(
       container.read(timerEndProvider)?.millisecondsSinceEpoch,
-      future.millisecondsSinceEpoch,
+      extended.millisecondsSinceEpoch,
     );
   });
 
-  test('discards a saved end time that already passed', () async {
-    final past = DateTime.now().subtract(const Duration(minutes: 1));
-    SharedPreferences.setMockInitialValues({
-      'timer_end': past.millisecondsSinceEpoch,
-    });
-    final prefs = await SharedPreferences.getInstance();
-    final container = makeContainer(prefs, fake);
+  test('refresh clears the state when the timer is gone natively', () async {
+    final container = makeContainer(fake);
+    final notifier = container.read(timerEndProvider.notifier);
+    await notifier.start(const Duration(minutes: 30));
+
+    fake.nativeEnd = null;
+    await notifier.refresh();
 
     expect(container.read(timerEndProvider), isNull);
-    expect(prefs.getInt('timer_end'), isNull);
   });
 }

@@ -8,18 +8,24 @@ class FakeAudioChannel extends Fake implements AudioChannel {
   int notificationRequests = 0;
   int settingsOpened = 0;
   DateTime? lastEnd;
+  DateTime? nativeEnd;
 
   @override
   Future<bool> scheduleTimer(DateTime end) async {
     scheduleCalls++;
     lastEnd = end;
+    if (canSchedule) nativeEnd = end;
     return canSchedule;
   }
 
   @override
   Future<void> cancelTimer() async {
     cancelCalls++;
+    nativeEnd = null;
   }
+
+  @override
+  Future<DateTime?> getEnd() async => nativeEnd;
 
   @override
   Future<void> requestNotificationPermission() async {

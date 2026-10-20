@@ -15,6 +15,17 @@ class AudioChannel {
   Future<void> openExactAlarmSettings() =>
       _channel.invokeMethod<void>('openExactAlarmSettings');
 
+  Future<DateTime?> getEnd() async {
+    try {
+      final millis = await _channel.invokeMethod<int>('getEnd');
+      return millis == null
+          ? null
+          : DateTime.fromMillisecondsSinceEpoch(millis);
+    } on Exception {
+      return null;
+    }
+  }
+
   Future<void> requestNotificationPermission() =>
       _channel.invokeMethod<void>('requestNotificationPermission');
 }
