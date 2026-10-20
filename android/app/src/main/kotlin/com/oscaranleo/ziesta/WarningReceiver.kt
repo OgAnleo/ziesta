@@ -27,7 +27,7 @@ class WarningReceiver : BroadcastReceiver() {
         )
 
         val notification = Notification.Builder(context, CHANNEL_ID)
-            .setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
+           .setSmallIcon(R.drawable.ic_stat_moon)
             .setContentTitle(context.getString(R.string.warning_title))
             .setContentText(context.getString(R.string.warning_text))
             .setContentIntent(openApp)
