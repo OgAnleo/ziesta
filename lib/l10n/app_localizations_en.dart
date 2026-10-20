@@ -13,4 +13,24 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get startTimer => 'Start';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String minutesButton(int minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get minutesUnit => 'min';
+
+  @override
+  String get permissionTitle => 'Permission required';
+
+  @override
+  String get permissionMessage => 'To pause the audio at the exact time, Ziesta needs the \"Alarms & reminders\" permission. Turn it on in the screen that will open and tap Start again.';
+
+  @override
+  String get openSettings => 'Open settings';
 }

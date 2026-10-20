@@ -1,5 +1,16 @@
 {
   "@@locale": "es",
   "appTitle": "Ziesta",
-  "startTimer": "Iniciar"
+  "startTimer": "Iniciar",
+  "cancel": "Cancelar",
+  "minutesButton": "{minutes} min",
+  "@minutesButton": {
+    "placeholders": {
+      "minutes": { "type": "int" }
+    }
+  },
+  "minutesUnit": "min",
+  "permissionTitle": "Permiso necesario",
+  "permissionMessage": "Para pausar el audio a la hora exacta, Ziesta necesita el permiso «Alarmas y recordatorios». Actívalo en la pantalla que se abrirá y vuelve a pulsar Iniciar.",
+  "openSettings": "Abrir ajustes"
 }

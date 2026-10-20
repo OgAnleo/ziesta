@@ -106,6 +106,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Start'**
   String get startTimer;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @minutesButton.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} min'**
+  String minutesButton(int minutes);
+
+  /// No description provided for @minutesUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'min'**
+  String get minutesUnit;
+
+  /// No description provided for @permissionTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission required'**
+  String get permissionTitle;
+
+  /// No description provided for @permissionMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'To pause the audio at the exact time, Ziesta needs the \"Alarms & reminders\" permission. Turn it on in the screen that will open and tap Start again.'**
+  String get permissionMessage;
+
+  /// No description provided for @openSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open settings'**
+  String get openSettings;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
