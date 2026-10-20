@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ziesta/features/timer/timer_notifier.dart';
 import 'package:ziesta/l10n/app_localizations.dart';
+import 'package:ziesta/features/settings/settings_screen.dart';
 
 class TimerScreen extends ConsumerStatefulWidget {
   const TimerScreen({super.key});
@@ -59,7 +60,19 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
     final remaining = ref.watch(remainingProvider).value;
 
     return Scaffold(
-      appBar: AppBar(title: Text(l10n.appTitle)),
+      appBar: AppBar(
+        title: Text(l10n.appTitle),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: l10n.settings,
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute<void>(builder: (_) => const SettingsScreen()),
+            ),
+          ),
+        ],
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

@@ -12,5 +12,10 @@
   "minutesUnit": "min",
   "permissionTitle": "Permiso necesario",
   "permissionMessage": "Para pausar el audio a la hora exacta, Ziesta necesita el permiso «Alarmas y recordatorios». Actívalo en la pantalla que se abrirá y vuelve a pulsar Iniciar.",
-  "openSettings": "Abrir ajustes"
+  "openSettings": "Abrir ajustes",
+  "settings": "Ajustes",
+  "theme": "Tema",
+  "themeSystem": "Sistema",
+  "themeLight": "Claro",
+  "themeDark": "Oscuro"
 }
