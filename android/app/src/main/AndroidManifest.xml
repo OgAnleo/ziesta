@@ -32,8 +32,8 @@
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
     
     <receiver android:name=".TimerReceiver" android:exported="false"/>
-    <receiver android:name=".WarningReceiver" android:exported="false"/>
     <receiver android:name=".ExtendReceiver" android:exported="false"/>
+    <receiver android:name=".CancelReceiver" android:exported="false"/>
     
         <meta-data
             android:name="flutterEmbedding"

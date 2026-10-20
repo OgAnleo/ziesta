@@ -11,6 +11,8 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
+    private var permissionResult: MethodChannel.Result? = null
+
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "ziesta/audio")
@@ -28,6 +30,9 @@ class MainActivity : FlutterActivity() {
                         TimerScheduler.cancel(this)
                         result.success(null)
                     }
+                    "getEnd" -> result.success(
+                        TimerStore.getEnd(this)?.takeIf { it > System.currentTimeMillis() }
+                    )
                     "openExactAlarmSettings" -> {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                             startActivity(
@@ -39,25 +44,41 @@ class MainActivity : FlutterActivity() {
                         }
                         result.success(null)
                     }
-                    
-                    "getEnd" -> result.success(
-                        TimerStore.getEnd(this)?.takeIf { it > System.currentTimeMillis() }
-                 )
-
                     "requestNotificationPermission" -> {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) !=
-                            PackageManager.PERMISSION_GRANTED
-                        ) {
+                        val needsRequest =
+                            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                                checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) !=
+                                PackageManager.PERMISSION_GRANTED
+                        if (needsRequest) {
+                            permissionResult = result
                             requestPermissions(
                                 arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                                0
+                                NOTIFICATION_REQUEST
                             )
+                        } else {
+                            result.success(true)
                         }
-                        result.success(null)
                     }
                     else -> result.notImplemented()
                 }
             }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == NOTIFICATION_REQUEST) {
+            permissionResult?.success(
+                grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED
+            )
+            permissionResult = null
+        }
+    }
+
+    companion object {
+        private const val NOTIFICATION_REQUEST = 1001
     }
 }

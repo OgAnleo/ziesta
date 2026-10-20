@@ -28,8 +28,9 @@ class FakeAudioChannel extends Fake implements AudioChannel {
   Future<DateTime?> getEnd() async => nativeEnd;
 
   @override
-  Future<void> requestNotificationPermission() async {
+  Future<bool> requestNotificationPermission() async {
     notificationRequests++;
+    return true;
   }
 
   @override

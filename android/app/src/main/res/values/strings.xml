@@ -1,6 +1,7 @@
 <resources>
-    <string name="channel_name">Timer warning</string>
-    <string name="warning_title">Ziesta</string>
-    <string name="warning_text">The audio will be paused in 1 minute</string>
+    <string name="channel_name">Timer</string>
+    <string name="notification_title">Ziesta</string>
+    <string name="notification_text">The audio will pause when the time runs out</string>
     <string name="action_extend">+15 min</string>
+    <string name="action_cancel">Cancel</string>
 </resources>

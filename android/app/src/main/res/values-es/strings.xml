@@ -1,6 +1,7 @@
 <resources>
-    <string name="channel_name">Aviso del temporizador</string>
-    <string name="warning_title">Ziesta</string>
-    <string name="warning_text">El audio se pausará en 1 minuto</string>
-    <string name="action_extend">+15 min</string> 
+    <string name="channel_name">Temporizador</string>
+    <string name="notification_title">Ziesta</string>
+    <string name="notification_text">El audio se pausará al terminar el tiempo</string>
+    <string name="action_extend">+15 min</string>
+    <string name="action_cancel">Cancelar</string>
 </resources>

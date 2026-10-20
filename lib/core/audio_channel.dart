@@ -26,6 +26,10 @@ class AudioChannel {
     }
   }
 
-  Future<void> requestNotificationPermission() =>
-      _channel.invokeMethod<void>('requestNotificationPermission');
+  Future<bool> requestNotificationPermission() async {
+    final granted = await _channel.invokeMethod<bool>(
+      'requestNotificationPermission',
+    );
+    return granted ?? false;
+  }
 }

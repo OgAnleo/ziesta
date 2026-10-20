@@ -8,17 +8,12 @@ import android.os.Build
 
 object TimerScheduler {
     const val EXTEND_MILLIS = 15 * 60_000L
-    private const val WARNING_MILLIS = 60_000L
 
-    private fun pending(
-        context: Context,
-        requestCode: Int,
-        receiver: Class<*>
-    ): PendingIntent =
+    private fun pending(context: Context): PendingIntent =
         PendingIntent.getBroadcast(
             context,
-            requestCode,
-            Intent(context, receiver),
+            0,
+            Intent(context, TimerReceiver::class.java),
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -31,24 +26,13 @@ object TimerScheduler {
 
     fun schedule(context: Context, endMillis: Long): Boolean {
         if (!canSchedule(context)) return false
-        val alarms = alarmManager(context)
-
-        alarms.setExactAndAllowWhileIdle(
+        alarmManager(context).setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             endMillis,
-            pending(context, 0, TimerReceiver::class.java)
+            pending(context)
         )
-
-        val warningAt = endMillis - WARNING_MILLIS
-        if (warningAt > System.currentTimeMillis()) {
-            alarms.setExactAndAllowWhileIdle(
-                AlarmManager.RTC_WAKEUP,
-                warningAt,
-                pending(context, 1, WarningReceiver::class.java)
-            )
-        }
-
         TimerStore.saveEnd(context, endMillis)
+        TimerNotification.show(context, endMillis)
         return true
     }
 
@@ -60,9 +44,8 @@ object TimerScheduler {
     }
 
     fun cancel(context: Context) {
-        val alarms = alarmManager(context)
-        alarms.cancel(pending(context, 0, TimerReceiver::class.java))
-        alarms.cancel(pending(context, 1, WarningReceiver::class.java))
+        alarmManager(context).cancel(pending(context))
         TimerStore.clear(context)
+        TimerNotification.hide(context)
     }
 }
