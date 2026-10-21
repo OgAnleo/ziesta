@@ -59,6 +59,37 @@ class FakeAudioChannel extends Fake implements AudioChannel {
     volumeExtend = enabled;
   }
 
+  bool lockAdminActive = false;
+  bool acceptLockAdmin = true;
+  bool lockOnEnd = false;
+  int lockRequests = 0;
+  int removeLockCalls = 0;
+
+  @override
+  Future<bool> isLockAdminActive() async => lockAdminActive;
+
+  @override
+  Future<bool> requestLockAdmin() async {
+    lockRequests++;
+    lockAdminActive = acceptLockAdmin;
+    return acceptLockAdmin;
+  }
+
+  @override
+  Future<void> removeLockAdmin() async {
+    removeLockCalls++;
+    lockAdminActive = false;
+    lockOnEnd = false;
+  }
+
+  @override
+  Future<bool> getLockOnEnd() async => lockOnEnd;
+
+  @override
+  Future<void> setLockOnEnd(bool enabled) async {
+    lockOnEnd = enabled;
+  }
+
   @override
   Future<void> shareText(String text) async {
     sharedTexts.add(text);

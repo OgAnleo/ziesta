@@ -21,6 +21,8 @@
   "extendAmount": "Tiempo al extender",
   "volumeExtend": "Extender con el botón de volumen",
   "volumeExtendHint": "Durante el último minuto, sube el volumen para añadir más tiempo.",
+  "lockOnEnd": "Bloquear la pantalla al terminar",
+  "lockOnEndHint": "Bloquea el móvil después de pausar el audio. Android te pedirá activar Ziesta como administrador del dispositivo.",
   "pausesAt": "Se pausará a las {time}",
   "@pausesAt": {
     "placeholders": {
@@ -52,5 +54,7 @@
   "faq7Q": "¿Qué pasa si reinicio el móvil?",
   "faq7A": "Al reiniciar, Android borra las alarmas pendientes, así que el temporizador se cancela y habría que programarlo de nuevo.",
   "faq8Q": "¿Ziesta usa internet o recoge datos?",
-  "faq8A": "No. Funciona sin conexión y no recoge ni envía ningún dato."
+  "faq8A": "No. Funciona sin conexión y no recoge ni envía ningún dato.",
+  "faq9Q": "¿Por qué Ziesta pide ser administrador del dispositivo?",
+  "faq9A": "Solo para bloquear la pantalla cuando termina el temporizador. Es opcional: desactiva el interruptor en Ajustes para quitarlo, y así podrás desinstalar la app con normalidad."
 }

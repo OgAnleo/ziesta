@@ -21,6 +21,8 @@
   "extendAmount": "Extend amount",
   "volumeExtend": "Extend with volume button",
   "volumeExtendHint": "During the last minute, press volume up to add more time.",
+  "lockOnEnd": "Lock screen when it ends",
+  "lockOnEndHint": "Locks the phone after pausing the audio. Android will ask you to turn on Ziesta as a device administrator.",
   "pausesAt": "Pauses at {time}",
   "@pausesAt": {
     "placeholders": {
@@ -52,5 +54,7 @@
   "faq7Q": "What happens if I restart my phone?",
   "faq7A": "When the phone restarts, Android clears pending alarms, so the timer is cancelled and you would need to set it again.",
   "faq8Q": "Does Ziesta use the internet or collect data?",
-  "faq8A": "No. It works offline and does not collect or send any data."
+  "faq8A": "No. It works offline and does not collect or send any data.",
+  "faq9Q": "Why does Ziesta ask to be a device administrator?",
+  "faq9A": "Only to lock the screen when the timer ends. It is optional: turn the switch off in Settings to remove it, which also lets you uninstall the app normally."
 }

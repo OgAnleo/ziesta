@@ -77,3 +77,37 @@ class VolumeExtendNotifier extends Notifier<bool> {
     await ref.read(audioChannelProvider).setVolumeExtend(enabled);
   }
 }
+
+/// Lock-on-end switch (already combined with the admin state) read before the app starts.
+final initialLockOnEndProvider = Provider<bool>((ref) => false);
+
+final lockOnEndProvider = NotifierProvider<LockOnEndNotifier, bool>(
+  LockOnEndNotifier.new,
+);
+
+class LockOnEndNotifier extends Notifier<bool> {
+  @override
+  bool build() => ref.read(initialLockOnEndProvider);
+
+  /// Turning on only sticks if the user accepts the system activation screen.
+  Future<void> set(bool enabled) async {
+    final channel = ref.read(audioChannelProvider);
+    if (enabled) {
+      if (!await channel.requestLockAdmin()) return;
+      state = true;
+      await channel.setLockOnEnd(true);
+    } else {
+      state = false;
+      await channel.removeLockAdmin();
+    }
+  }
+
+  /// The admin can be revoked from the system settings: show OFF if so.
+  Future<void> refresh() async {
+    final channel = ref.read(audioChannelProvider);
+    if (state && !await channel.isLockAdminActive()) {
+      state = false;
+      await channel.setLockOnEnd(false);
+    }
+  }
+}

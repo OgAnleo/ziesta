@@ -11,6 +11,7 @@ class TimerReceiver : BroadcastReceiver() {
         val pending = goAsync()
 
         MediaPauser.pause(context)
+        LockController.lockIfEnabled(context)
         TimerStore.clear(context)
         context.stopService(Intent(context, FadeService::class.java))
         TimerNotification.hide(context)

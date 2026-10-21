@@ -62,6 +62,13 @@ class AppLocalizationsEs extends AppLocalizations {
       'Durante el último minuto, sube el volumen para añadir más tiempo.';
 
   @override
+  String get lockOnEnd => 'Bloquear la pantalla al terminar';
+
+  @override
+  String get lockOnEndHint =>
+      'Bloquea el móvil después de pausar el audio. Android te pedirá activar Ziesta como administrador del dispositivo.';
+
+  @override
   String pausesAt(String time) {
     return 'Se pausará a las $time';
   }
@@ -138,4 +145,11 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get faq8A =>
       'No. Funciona sin conexión y no recoge ni envía ningún dato.';
+
+  @override
+  String get faq9Q => '¿Por qué Ziesta pide ser administrador del dispositivo?';
+
+  @override
+  String get faq9A =>
+      'Solo para bloquear la pantalla cuando termina el temporizador. Es opcional: desactiva el interruptor en Ajustes para quitarlo, y así podrás desinstalar la app con normalidad.';
 }

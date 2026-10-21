@@ -23,7 +23,7 @@ flutter run               # debug on the connected phone
 flutter run --release     # release behaviour (R8, no DEBUG banner)
 dart format .
 flutter analyze           # must report: No issues found!
-flutter test              # 20 tests: 7 notifier + 6 screen + 5 settings notifier + 2 settings screen
+flutter test              # 25 tests: 7 notifier + 6 screen + 9 settings notifier + 3 settings screen
 flutter build apk --release
 ```
 
@@ -44,7 +44,8 @@ Two layers talking through one `MethodChannel` named `ziesta/audio`.
 - `core/audio_channel.dart`: Dart side of the channel (`scheduleTimer`, `cancelTimer`,
   `getEnd`, `getExtendMinutes`, `setExtendMinutes`, `getVolumeExtend`, `setVolumeExtend`,
   `openExactAlarmSettings`,
-  `requestNotificationPermission`, `shareText`).
+  `requestNotificationPermission`, `shareText`, and the lock-screen ones: `isLockAdminActive`,
+  `requestLockAdmin`, `removeLockAdmin`, `getLockOnEnd`, `setLockOnEnd`).
 - `core/preferences_provider.dart`, `core/app_theme.dart` (minimalist dark theme).
 - `features/timer/`: `timer_notifier.dart` (Riverpod: `timerEndProvider`,
   `remainingProvider`), `timer_screen.dart` (wheel 1-180 min, quick buttons 10/20/30/60,
@@ -53,6 +54,10 @@ Two layers talking through one `MethodChannel` named `ziesta/audio`.
   (stored in `shared_preferences`: `theme_mode`, `default_minutes`) and extend amount
   (slider 1-60 min, default 15, saved on release) and the "extend with volume button" switch (default on). Both are
   native-owned and read in `main()` via `initialExtendMinutesProvider` / `initialVolumeExtendProvider`.
+  The "lock screen when it ends" switch (`lockOnEndProvider`, default off) is read in `main()` as
+  stored value AND admin active (`initialLockOnEndProvider`); the settings screen calls `refresh()`
+  when opened so a revoked admin shows OFF. Turning it on only sticks if the user accepts the
+  system activation screen.
 - `l10n/`: `app_es.arb` is the template, `app_en.arb` the English copy. `l10n.yaml` is in the
   project root. Every key must exist in both files.
 
@@ -68,6 +73,15 @@ Two layers talking through one `MethodChannel` named `ziesta/audio`.
   `VolumeFader` saves/restores the original volume. If `volume_extend` is on, it also listens
   for `VOLUME_CHANGED_ACTION`: a STREAM_MUSIC increase (value > previous) is the user and extends
   the timer; `VolumeFader.restore` sets `ignoreIncreasesUntil` (1.5 s) so our own restore is ignored.
+- Lock screen (optional, **isolated and removable**): `LockAdminReceiver` (empty
+  `DeviceAdminReceiver`), `LockController` (`isActive`, `requestActivation`, `remove`,
+  `lockIfEnabled`), `res/xml/device_admin.xml` (only `<force-lock/>`), the manifest `<receiver>`
+  and the `lock_admin_explanation` strings. `TimerReceiver` calls `lockIfEnabled` right after
+  `MediaPauser.pause`; it calls `lockNow()` only if `lock_on_end` (in `TimerStore`) is on AND the
+  admin is active. `MainActivity` awaits the activation screen in `onActivityResult`. To remove
+  the feature, delete those files/entries plus the calls in `MainActivity`, `TimerReceiver`,
+  `TimerStore` and the Dart switch/notifier/FAQ 9. While Ziesta is admin it cannot be uninstalled,
+  hence turning the switch off calls `removeActiveAdmin`.
 - `TimerNotification`: ongoing, silent notification (low-importance channel `ziesta_timer`)
   with a system-drawn countdown and two actions: `ExtendReceiver` (+N min, label from the stored extend amount) and
   `CancelReceiver`.
@@ -114,3 +128,6 @@ tests, `remainingProvider` (avoids pending timers). Tests run in English.
 - Google Play: needs a privacy policy, an app bundle (`flutter build appbundle`), the exact
   alarm permission declaration, and for a new personal account a closed test (12 testers,
   14 days). Check Google's current requirements first.
+- Google Play caveat: Play restricts the Device Admin API (it must be core functionality and
+  declared/justified in review). Locking the screen is likely not core, so this feature may need
+  to be removed (see "isolated and removable") before publishing there; the GitHub APK is fine.

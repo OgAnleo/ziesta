@@ -15,6 +15,8 @@ Future<void> main() async {
   final initialEnd = await channel.getEnd();
   final extendMinutes = await channel.getExtendMinutes();
   final volumeExtend = await channel.getVolumeExtend();
+  final lockOnEnd =
+      await channel.getLockOnEnd() && await channel.isLockAdminActive();
   runApp(
     ProviderScope(
       overrides: [
@@ -22,6 +24,7 @@ Future<void> main() async {
         initialTimerEndProvider.overrideWithValue(initialEnd),
         initialExtendMinutesProvider.overrideWithValue(extendMinutes),
         initialVolumeExtendProvider.overrideWithValue(volumeExtend),
+        initialLockOnEndProvider.overrideWithValue(lockOnEnd),
       ],
       child: const ZiestaApp(),
     ),

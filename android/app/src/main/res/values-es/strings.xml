@@ -4,4 +4,5 @@
     <string name="notification_text">El audio se pausará al terminar el tiempo</string>
     <string name="action_extend">+%1$d min</string>
     <string name="action_cancel">Cancelar</string>
+    <string name="lock_admin_explanation">Ziesta solo usa este permiso para bloquear la pantalla cuando termina el temporizador. Puedes desactivarlo en los ajustes de Ziesta cuando quieras.</string>
 </resources>

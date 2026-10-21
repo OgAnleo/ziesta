@@ -67,12 +67,45 @@ void main() {
       ),
     );
 
-    expect(tester.widget<Switch>(find.byType(Switch)).value, isTrue);
+    expect(tester.widget<Switch>(find.byType(Switch).first).value, isTrue);
 
     await tester.tap(find.text('Extend with volume button'));
     await tester.pumpAndSettle();
 
-    expect(tester.widget<Switch>(find.byType(Switch)).value, isFalse);
+    expect(tester.widget<Switch>(find.byType(Switch).first).value, isFalse);
     expect(fake.volumeExtend, isFalse);
+  });
+
+  testWidgets('the lock switch is off and turns on when accepted', (
+    tester,
+  ) async {
+    final fake = FakeAudioChannel();
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          audioChannelProvider.overrideWithValue(fake),
+        ],
+        child: const MaterialApp(
+          locale: Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          home: SettingsScreen(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final lockSwitch = find.byType(Switch).last;
+    expect(tester.widget<Switch>(lockSwitch).value, isFalse);
+
+    await tester.tap(find.text('Lock screen when it ends'));
+    await tester.pumpAndSettle();
+
+    expect(tester.widget<Switch>(lockSwitch).value, isTrue);
+    expect(fake.lockOnEnd, isTrue);
   });
 }

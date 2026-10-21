@@ -62,6 +62,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'During the last minute, press volume up to add more time.';
 
   @override
+  String get lockOnEnd => 'Lock screen when it ends';
+
+  @override
+  String get lockOnEndHint =>
+      'Locks the phone after pausing the audio. Android will ask you to turn on Ziesta as a device administrator.';
+
+  @override
   String pausesAt(String time) {
     return 'Pauses at $time';
   }
@@ -138,4 +145,11 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get faq8A =>
       'No. It works offline and does not collect or send any data.';
+
+  @override
+  String get faq9Q => 'Why does Ziesta ask to be a device administrator?';
+
+  @override
+  String get faq9A =>
+      'Only to lock the screen when the timer ends. It is optional: turn the switch off in Settings to remove it, which also lets you uninstall the app normally.';
 }

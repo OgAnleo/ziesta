@@ -10,6 +10,7 @@ object TimerStore {
     private const val MIN_EXTEND_MINUTES = 1
     private const val MAX_EXTEND_MINUTES = 60
     private const val KEY_VOLUME_EXTEND = "volume_extend"
+    private const val KEY_LOCK_ON_END = "lock_on_end"
 
     private fun prefs(context: Context) =
         context.getSharedPreferences(FILE, Context.MODE_PRIVATE)
@@ -38,6 +39,13 @@ object TimerStore {
 
     fun saveVolumeExtend(context: Context, enabled: Boolean) {
         prefs(context).edit().putBoolean(KEY_VOLUME_EXTEND, enabled).apply()
+    }
+
+    fun getLockOnEnd(context: Context): Boolean =
+        prefs(context).getBoolean(KEY_LOCK_ON_END, false)
+
+    fun saveLockOnEnd(context: Context, enabled: Boolean) {
+        prefs(context).edit().putBoolean(KEY_LOCK_ON_END, enabled).apply()
     }
 
     fun clear(context: Context) {

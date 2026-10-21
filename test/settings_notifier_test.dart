@@ -8,7 +8,11 @@ import 'helpers/fake_audio_channel.dart';
 void main() {
   late FakeAudioChannel fake;
 
-  ProviderContainer makeContainer({int? initial, bool? volumeExtend}) {
+  ProviderContainer makeContainer({
+    int? initial,
+    bool? volumeExtend,
+    bool? lockOnEnd,
+  }) {
     final container = ProviderContainer(
       overrides: [
         audioChannelProvider.overrideWithValue(fake),
@@ -16,6 +20,8 @@ void main() {
           initialExtendMinutesProvider.overrideWithValue(initial),
         if (volumeExtend != null)
           initialVolumeExtendProvider.overrideWithValue(volumeExtend),
+        if (lockOnEnd != null)
+          initialLockOnEndProvider.overrideWithValue(lockOnEnd),
       ],
     );
     addTearDown(container.dispose);
@@ -54,5 +60,42 @@ void main() {
 
     expect(container.read(volumeExtendProvider), isFalse);
     expect(fake.volumeExtend, isFalse);
+  });
+
+  test('lock on end is off by default', () {
+    expect(makeContainer().read(lockOnEndProvider), isFalse);
+  });
+
+  test('turning lock on saves only if the activation is accepted', () async {
+    final container = makeContainer();
+
+    fake.acceptLockAdmin = false;
+    await container.read(lockOnEndProvider.notifier).set(true);
+    expect(container.read(lockOnEndProvider), isFalse);
+    expect(fake.lockOnEnd, isFalse);
+
+    fake.acceptLockAdmin = true;
+    await container.read(lockOnEndProvider.notifier).set(true);
+    expect(container.read(lockOnEndProvider), isTrue);
+    expect(fake.lockOnEnd, isTrue);
+  });
+
+  test('turning lock off removes the admin', () async {
+    final container = makeContainer(lockOnEnd: true);
+
+    await container.read(lockOnEndProvider.notifier).set(false);
+
+    expect(container.read(lockOnEndProvider), isFalse);
+    expect(fake.removeLockCalls, 1);
+  });
+
+  test('refresh turns the switch off if the admin was revoked', () async {
+    fake.lockAdminActive = false;
+    final container = makeContainer(lockOnEnd: true);
+
+    await container.read(lockOnEndProvider.notifier).refresh();
+
+    expect(container.read(lockOnEndProvider), isFalse);
+    expect(fake.lockOnEnd, isFalse);
   });
 }

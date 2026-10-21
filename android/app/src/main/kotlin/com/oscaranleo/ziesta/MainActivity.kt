@@ -12,6 +12,7 @@ import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
     private var permissionResult: MethodChannel.Result? = null
+    private var lockAdminResult: MethodChannel.Result? = null
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
@@ -54,6 +55,30 @@ class MainActivity : FlutterActivity() {
                             result.error("INVALID", "Missing enabled", null)
                         } else {
                             TimerStore.saveVolumeExtend(this, enabled)
+                            result.success(null)
+                        }
+                    }
+                    "isLockAdminActive" -> result.success(LockController.isActive(this))
+                    "requestLockAdmin" -> {
+                        if (LockController.isActive(this)) {
+                            result.success(true)
+                        } else {
+                            lockAdminResult = result
+                            LockController.requestActivation(this, LOCK_ADMIN_REQUEST)
+                        }
+                    }
+                    "removeLockAdmin" -> {
+                        LockController.remove(this)
+                        TimerStore.saveLockOnEnd(this, false)
+                        result.success(null)
+                    }
+                    "getLockOnEnd" -> result.success(TimerStore.getLockOnEnd(this))
+                    "setLockOnEnd" -> {
+                        val enabled = call.argument<Boolean>("enabled")
+                        if (enabled == null) {
+                            result.error("INVALID", "Missing enabled", null)
+                        } else {
+                            TimerStore.saveLockOnEnd(this, enabled)
                             result.success(null)
                         }
                     }
@@ -115,7 +140,17 @@ class MainActivity : FlutterActivity() {
         }
     }
 
+    @Deprecated("Flutter's FlutterActivity still delivers results through this method")
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == LOCK_ADMIN_REQUEST) {
+            lockAdminResult?.success(LockController.isActive(this))
+            lockAdminResult = null
+        }
+    }
+
     companion object {
         private const val NOTIFICATION_REQUEST = 1001
+        private const val LOCK_ADMIN_REQUEST = 1002
     }
 }

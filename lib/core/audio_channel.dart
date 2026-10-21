@@ -56,6 +56,34 @@ class AudioChannel {
   Future<void> setVolumeExtend(bool enabled) =>
       _channel.invokeMethod<void>('setVolumeExtend', {'enabled': enabled});
 
+  Future<bool> isLockAdminActive() async {
+    try {
+      return await _channel.invokeMethod<bool>('isLockAdminActive') ?? false;
+    } on Exception {
+      return false;
+    }
+  }
+
+  /// Opens the system activation screen; true only if the user accepted.
+  Future<bool> requestLockAdmin() async {
+    final granted = await _channel.invokeMethod<bool>('requestLockAdmin');
+    return granted ?? false;
+  }
+
+  Future<void> removeLockAdmin() =>
+      _channel.invokeMethod<void>('removeLockAdmin');
+
+  Future<bool> getLockOnEnd() async {
+    try {
+      return await _channel.invokeMethod<bool>('getLockOnEnd') ?? false;
+    } on Exception {
+      return false;
+    }
+  }
+
+  Future<void> setLockOnEnd(bool enabled) =>
+      _channel.invokeMethod<void>('setLockOnEnd', {'enabled': enabled});
+
   Future<void> shareText(String text) =>
       _channel.invokeMethod<void>('shareText', {'text': text});
 }

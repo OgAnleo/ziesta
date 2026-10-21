@@ -194,6 +194,18 @@ abstract class AppLocalizations {
   /// **'During the last minute, press volume up to add more time.'**
   String get volumeExtendHint;
 
+  /// No description provided for @lockOnEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock screen when it ends'**
+  String get lockOnEnd;
+
+  /// No description provided for @lockOnEndHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Locks the phone after pausing the audio. Android will ask you to turn on Ziesta as a device administrator.'**
+  String get lockOnEndHint;
+
   /// No description provided for @pausesAt.
   ///
   /// In en, this message translates to:
@@ -325,6 +337,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No. It works offline and does not collect or send any data.'**
   String get faq8A;
+
+  /// No description provided for @faq9Q.
+  ///
+  /// In en, this message translates to:
+  /// **'Why does Ziesta ask to be a device administrator?'**
+  String get faq9Q;
+
+  /// No description provided for @faq9A.
+  ///
+  /// In en, this message translates to:
+  /// **'Only to lock the screen when the timer ends. It is optional: turn the switch off in Settings to remove it, which also lets you uninstall the app normally.'**
+  String get faq9A;
 }
 
 class _AppLocalizationsDelegate

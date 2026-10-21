@@ -56,8 +56,37 @@ class SettingsScreen extends ConsumerWidget {
             onChanged: (value) =>
                 ref.read(volumeExtendProvider.notifier).set(value),
           ),
+          const _LockSwitch(),
         ],
       ),
+    );
+  }
+}
+
+class _LockSwitch extends ConsumerStatefulWidget {
+  const _LockSwitch();
+
+  @override
+  ConsumerState<_LockSwitch> createState() => _LockSwitchState();
+}
+
+class _LockSwitchState extends ConsumerState<_LockSwitch> {
+  @override
+  void initState() {
+    super.initState();
+    // Provider changes are not allowed while the widget tree is building.
+    Future.microtask(() => ref.read(lockOnEndProvider.notifier).refresh());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    return SwitchListTile(
+      contentPadding: EdgeInsets.zero,
+      title: Text(l10n.lockOnEnd),
+      subtitle: Text(l10n.lockOnEndHint),
+      value: ref.watch(lockOnEndProvider),
+      onChanged: (value) => ref.read(lockOnEndProvider.notifier).set(value),
     );
   }
 }
