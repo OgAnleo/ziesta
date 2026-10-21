@@ -176,6 +176,24 @@ abstract class AppLocalizations {
   /// **'Default duration'**
   String get defaultDuration;
 
+  /// No description provided for @extendAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Extend amount'**
+  String get extendAmount;
+
+  /// No description provided for @volumeExtend.
+  ///
+  /// In en, this message translates to:
+  /// **'Extend with volume button'**
+  String get volumeExtend;
+
+  /// No description provided for @volumeExtendHint.
+  ///
+  /// In en, this message translates to:
+  /// **'During the last minute, press volume up to add more time.'**
+  String get volumeExtendHint;
+
   /// No description provided for @pausesAt.
   ///
   /// In en, this message translates to:

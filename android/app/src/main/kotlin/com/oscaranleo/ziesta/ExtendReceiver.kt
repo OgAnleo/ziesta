@@ -6,6 +6,6 @@ import android.content.Intent
 
 class ExtendReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        TimerScheduler.extend(context, TimerScheduler.EXTEND_MILLIS)
+        TimerScheduler.extend(context)
     }
 }

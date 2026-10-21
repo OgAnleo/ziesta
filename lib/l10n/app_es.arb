@@ -18,6 +18,9 @@
   "themeLight": "Claro",
   "themeDark": "Oscuro",
   "defaultDuration": "Duración por defecto",
+  "extendAmount": "Tiempo al extender",
+  "volumeExtend": "Extender con el botón de volumen",
+  "volumeExtendHint": "Durante el último minuto, sube el volumen para añadir más tiempo.",
   "pausesAt": "Se pausará a las {time}",
   "@pausesAt": {
     "placeholders": {

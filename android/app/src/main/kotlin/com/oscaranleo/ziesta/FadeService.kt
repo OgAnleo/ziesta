@@ -2,8 +2,12 @@ package com.oscaranleo.ziesta
 
 import android.app.NotificationManager
 import android.app.Service
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.ServiceInfo
+import android.media.AudioManager
 import android.os.Build
 import android.os.Handler
 import android.os.IBinder
@@ -11,6 +15,7 @@ import android.os.Looper
 
 class FadeService : Service() {
     private val handler = Handler(Looper.getMainLooper())
+    private var volumeReceiver: BroadcastReceiver? = null
 
     private val tick = object : Runnable {
         override fun run() {
@@ -54,9 +59,31 @@ class FadeService : Service() {
         }
 
         VolumeFader.begin(this)
+        if (TimerStore.getVolumeExtend(this)) registerVolumeReceiver()
         handler.removeCallbacks(tick)
         handler.post(tick)
         return START_NOT_STICKY
+    }
+
+    private fun registerVolumeReceiver() {
+        if (volumeReceiver != null) return
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(context: Context, intent: Intent) {
+                val stream = intent.getIntExtra(EXTRA_STREAM_TYPE, -1)
+                val value = intent.getIntExtra(EXTRA_STREAM_VALUE, -1)
+                val previous = intent.getIntExtra(EXTRA_PREV_STREAM_VALUE, -1)
+                if (stream != AudioManager.STREAM_MUSIC || value <= previous) return
+                if (System.currentTimeMillis() < VolumeFader.ignoreIncreasesUntil) return
+                TimerScheduler.extend(context)
+            }
+        }
+        val filter = IntentFilter(VOLUME_CHANGED_ACTION)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(receiver, filter)
+        }
+        volumeReceiver = receiver
     }
 
     override fun onTimeout(startId: Int) {
@@ -64,6 +91,8 @@ class FadeService : Service() {
     }
 
     override fun onDestroy() {
+        volumeReceiver?.let { unregisterReceiver(it) }
+        volumeReceiver = null
         handler.removeCallbacksAndMessages(null)
         super.onDestroy()
     }
@@ -72,5 +101,10 @@ class FadeService : Service() {
 
     companion object {
         private const val STEP_MILLIS = 1_000L
+        private const val VOLUME_CHANGED_ACTION = "android.media.VOLUME_CHANGED_ACTION"
+        private const val EXTRA_STREAM_TYPE = "android.media.EXTRA_VOLUME_STREAM_TYPE"
+        private const val EXTRA_STREAM_VALUE = "android.media.EXTRA_VOLUME_STREAM_VALUE"
+        private const val EXTRA_PREV_STREAM_VALUE =
+            "android.media.EXTRA_PREV_VOLUME_STREAM_VALUE"
     }
 }

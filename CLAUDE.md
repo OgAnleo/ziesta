@@ -23,7 +23,7 @@ flutter run               # debug on the connected phone
 flutter run --release     # release behaviour (R8, no DEBUG banner)
 dart format .
 flutter analyze           # must report: No issues found!
-flutter test              # 13 tests: 7 notifier + 6 screen
+flutter test              # 20 tests: 7 notifier + 6 screen + 5 settings notifier + 2 settings screen
 flutter build apk --release
 ```
 
@@ -42,13 +42,17 @@ Two layers talking through one `MethodChannel` named `ziesta/audio`.
   (overrides `sharedPreferencesProvider` and `initialTimerEndProvider`).
 - `app.dart`: `MaterialApp`, themes, localization.
 - `core/audio_channel.dart`: Dart side of the channel (`scheduleTimer`, `cancelTimer`,
-  `getEnd`, `openExactAlarmSettings`, `requestNotificationPermission`).
+  `getEnd`, `getExtendMinutes`, `setExtendMinutes`, `getVolumeExtend`, `setVolumeExtend`,
+  `openExactAlarmSettings`,
+  `requestNotificationPermission`, `shareText`).
 - `core/preferences_provider.dart`, `core/app_theme.dart` (minimalist dark theme).
 - `features/timer/`: `timer_notifier.dart` (Riverpod: `timerEndProvider`,
   `remainingProvider`), `timer_screen.dart` (wheel 1-180 min, quick buttons 10/20/30/60,
   countdown view with transitions).
-- `features/settings/`: theme mode (light/dark only, dark by default) and default duration,
-  stored in `shared_preferences` (`theme_mode`, `default_minutes`).
+- `features/settings/`: theme mode (light/dark only, dark by default), default duration
+  (stored in `shared_preferences`: `theme_mode`, `default_minutes`) and extend amount
+  (slider 1-60 min, default 15, saved on release) and the "extend with volume button" switch (default on). Both are
+  native-owned and read in `main()` via `initialExtendMinutesProvider` / `initialVolumeExtendProvider`.
 - `l10n/`: `app_es.arb` is the template, `app_en.arb` the English copy. `l10n.yaml` is in the
   project root. Every key must exist in both files.
 
@@ -56,14 +60,16 @@ Two layers talking through one `MethodChannel` named `ziesta/audio`.
 - `MainActivity`: channel handler; awaits the notification permission result.
 - `TimerScheduler`: exact alarms (`setExactAndAllowWhileIdle`): end alarm -> `TimerReceiver`
   (request code 0), fade alarm at end - 60 s -> `FadeService` (request code 1).
-  `EXTEND_MILLIS` must be `15 * 60_000L` in committed code.
-- `TimerStore`: owns the end time (native `SharedPreferences` `ziesta_timer`).
+  The extend amount comes from `TimerStore`, not a constant.
+- `TimerStore`: owns the end time, `extend_minutes` and `volume_extend` (native `SharedPreferences` `ziesta_timer`).
 - `TimerReceiver`: pauses audio (`MediaPauser`: audio focus + `KEYCODE_MEDIA_PAUSE`), clears
   the store, hides the notification, restores the volume 1.5 s later (`goAsync`).
 - `FadeService`: `shortService` foreground service that lowers the music volume every second;
-  `VolumeFader` saves/restores the original volume.
+  `VolumeFader` saves/restores the original volume. If `volume_extend` is on, it also listens
+  for `VOLUME_CHANGED_ACTION`: a STREAM_MUSIC increase (value > previous) is the user and extends
+  the timer; `VolumeFader.restore` sets `ignoreIncreasesUntil` (1.5 s) so our own restore is ignored.
 - `TimerNotification`: ongoing, silent notification (low-importance channel `ziesta_timer`)
-  with a system-drawn countdown and two actions: `ExtendReceiver` (+15 min) and
+  with a system-drawn countdown and two actions: `ExtendReceiver` (+N min, label from the stored extend amount) and
   `CancelReceiver`.
 
 **Key decision**: the native side is the single source of truth for the end time, so the

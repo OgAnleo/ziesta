@@ -33,6 +33,29 @@ class AudioChannel {
     return granted ?? false;
   }
 
+  Future<int> getExtendMinutes() async {
+    try {
+      final minutes = await _channel.invokeMethod<int>('getExtendMinutes');
+      return minutes ?? 15;
+    } on Exception {
+      return 15;
+    }
+  }
+
+  Future<void> setExtendMinutes(int minutes) =>
+      _channel.invokeMethod<void>('setExtendMinutes', {'minutes': minutes});
+
+  Future<bool> getVolumeExtend() async {
+    try {
+      return await _channel.invokeMethod<bool>('getVolumeExtend') ?? true;
+    } on Exception {
+      return true;
+    }
+  }
+
+  Future<void> setVolumeExtend(bool enabled) =>
+      _channel.invokeMethod<void>('setVolumeExtend', {'enabled': enabled});
+
   Future<void> shareText(String text) =>
       _channel.invokeMethod<void>('shareText', {'text': text});
 }

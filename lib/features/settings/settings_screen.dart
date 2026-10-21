@@ -12,6 +12,7 @@ class SettingsScreen extends ConsumerWidget {
     final textTheme = Theme.of(context).textTheme;
     final themeMode = ref.watch(themeModeProvider);
     final defaultMinutes = ref.watch(defaultMinutesProvider);
+    final volumeExtend = ref.watch(volumeExtendProvider);
 
     return Scaffold(
       appBar: AppBar(title: Text(l10n.settings)),
@@ -43,8 +44,62 @@ class SettingsScreen extends ConsumerWidget {
             onChanged: (value) =>
                 ref.read(defaultMinutesProvider.notifier).set(value.round()),
           ),
+          const SizedBox(height: 32),
+          Text(l10n.extendAmount, style: textTheme.titleMedium),
+          const _ExtendSlider(),
+          const SizedBox(height: 16),
+          SwitchListTile(
+            contentPadding: EdgeInsets.zero,
+            title: Text(l10n.volumeExtend),
+            subtitle: Text(l10n.volumeExtendHint),
+            value: volumeExtend,
+            onChanged: (value) =>
+                ref.read(volumeExtendProvider.notifier).set(value),
+          ),
         ],
       ),
+    );
+  }
+}
+
+class _ExtendSlider extends ConsumerStatefulWidget {
+  const _ExtendSlider();
+
+  @override
+  ConsumerState<_ExtendSlider> createState() => _ExtendSliderState();
+}
+
+class _ExtendSliderState extends ConsumerState<_ExtendSlider> {
+  // Value shown while the finger is down; null when the slider is at rest.
+  double? _dragging;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final saved = ref.watch(extendMinutesProvider);
+    final value = _dragging ?? saved.toDouble();
+
+    return Column(
+      children: [
+        Text(
+          l10n.minutesButton(value.round()),
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
+        SliderTheme(
+          data: SliderTheme.of(context).copyWith(trackHeight: 2),
+          child: Slider(
+            min: 1,
+            max: maxExtendMinutes.toDouble(),
+            divisions: maxExtendMinutes - 1,
+            value: value,
+            onChanged: (v) => setState(() => _dragging = v),
+            onChangeEnd: (v) {
+              ref.read(extendMinutesProvider.notifier).set(v.round());
+              setState(() => _dragging = null);
+            },
+          ),
+        ),
+      ],
     );
   }
 }

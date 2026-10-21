@@ -7,7 +7,6 @@ import android.content.Intent
 import android.os.Build
 
 object TimerScheduler {
-    const val EXTEND_MILLIS = 15 * 60_000L
     const val FADE_MILLIS = 60_000L
 
     private const val FLAGS =
@@ -58,10 +57,10 @@ object TimerScheduler {
         return true
     }
 
-    fun extend(context: Context, extraMillis: Long): Long? {
+    fun extend(context: Context): Long? {
         val end = TimerStore.getEnd(context) ?: return null
         if (end <= System.currentTimeMillis()) return null
-        val newEnd = end + extraMillis
+        val newEnd = end + TimerStore.getExtendMinutes(context) * 60_000L
         return if (schedule(context, newEnd)) newEnd else null
     }
 

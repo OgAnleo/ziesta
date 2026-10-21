@@ -32,6 +32,10 @@ object TimerNotification {
             context, 0, Intent(context, MainActivity::class.java), FLAGS
         )
 
+        val extendLabel = context.getString(
+            R.string.action_extend, TimerStore.getExtendMinutes(context)
+        )
+
         return Notification.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_stat_moon)
             .setContentTitle(context.getString(R.string.notification_title))
@@ -44,8 +48,8 @@ object TimerNotification {
             .setOnlyAlertOnce(true)
             .setVisibility(Notification.VISIBILITY_PUBLIC)
             .setContentIntent(openApp)
-            .addAction(action(context, R.string.action_extend, 2, ExtendReceiver::class.java))
-            .addAction(action(context, R.string.action_cancel, 3, CancelReceiver::class.java))
+            .addAction(action(context, extendLabel, 2, ExtendReceiver::class.java))
+            .addAction(action(context, context.getString(R.string.action_cancel), 3, CancelReceiver::class.java))
             .build()
     }
 
@@ -62,7 +66,7 @@ object TimerNotification {
 
     private fun action(
         context: Context,
-        titleRes: Int,
+        title: String,
         requestCode: Int,
         receiver: Class<*>
     ): Notification.Action {
@@ -71,7 +75,7 @@ object TimerNotification {
         )
         return Notification.Action.Builder(
             Icon.createWithResource(context, R.drawable.ic_stat_moon),
-            context.getString(titleRes),
+            title,
             intent
         ).build()
     }

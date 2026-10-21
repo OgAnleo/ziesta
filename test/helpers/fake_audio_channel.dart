@@ -10,6 +10,9 @@ class FakeAudioChannel extends Fake implements AudioChannel {
   DateTime? lastEnd;
   DateTime? nativeEnd;
   final sharedTexts = <String>[];
+  int extendMinutes = 15;
+  int setExtendCalls = 0;
+  bool volumeExtend = true;
 
   @override
   Future<bool> scheduleTimer(DateTime end) async {
@@ -37,6 +40,23 @@ class FakeAudioChannel extends Fake implements AudioChannel {
   @override
   Future<void> openExactAlarmSettings() async {
     settingsOpened++;
+  }
+
+  @override
+  Future<int> getExtendMinutes() async => extendMinutes;
+
+  @override
+  Future<void> setExtendMinutes(int minutes) async {
+    setExtendCalls++;
+    extendMinutes = minutes;
+  }
+
+  @override
+  Future<bool> getVolumeExtend() async => volumeExtend;
+
+  @override
+  Future<void> setVolumeExtend(bool enabled) async {
+    volumeExtend = enabled;
   }
 
   @override

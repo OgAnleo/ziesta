@@ -7,6 +7,12 @@ import kotlin.math.roundToInt
 object VolumeFader {
     private const val FILE = "ziesta_volume"
     private const val KEY_ORIGINAL = "original"
+    private const val IGNORE_MILLIS = 1_500L
+
+    /** Volume increases before this time come from our own restore, not the user. */
+    @Volatile
+    var ignoreIncreasesUntil = 0L
+        private set
 
     private fun audio(context: Context) =
         context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -36,6 +42,7 @@ object VolumeFader {
         val prefs = prefs(context)
         val original = prefs.getInt(KEY_ORIGINAL, -1)
         if (original >= 0) {
+            ignoreIncreasesUntil = System.currentTimeMillis() + IGNORE_MILLIS
             audio(context).setStreamVolume(AudioManager.STREAM_MUSIC, original, 0)
             prefs.edit().remove(KEY_ORIGINAL).apply()
         }

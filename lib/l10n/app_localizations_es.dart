@@ -52,6 +52,16 @@ class AppLocalizationsEs extends AppLocalizations {
   String get defaultDuration => 'Duración por defecto';
 
   @override
+  String get extendAmount => 'Tiempo al extender';
+
+  @override
+  String get volumeExtend => 'Extender con el botón de volumen';
+
+  @override
+  String get volumeExtendHint =>
+      'Durante el último minuto, sube el volumen para añadir más tiempo.';
+
+  @override
   String pausesAt(String time) {
     return 'Se pausará a las $time';
   }

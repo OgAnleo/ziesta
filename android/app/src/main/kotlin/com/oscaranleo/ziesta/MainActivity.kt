@@ -33,6 +33,30 @@ class MainActivity : FlutterActivity() {
                     "getEnd" -> result.success(
                         TimerStore.getEnd(this)?.takeIf { it > System.currentTimeMillis() }
                     )
+                    "getExtendMinutes" -> result.success(TimerStore.getExtendMinutes(this))
+                    "setExtendMinutes" -> {
+                        val minutes = call.argument<Int>("minutes")
+                        if (minutes == null) {
+                            result.error("INVALID", "Missing minutes", null)
+                        } else {
+                            TimerStore.saveExtendMinutes(this, minutes)
+                            val end = TimerStore.getEnd(this)
+                            if (end != null && end > System.currentTimeMillis()) {
+                                TimerNotification.show(this, end)
+                            }
+                            result.success(null)
+                        }
+                    }
+                    "getVolumeExtend" -> result.success(TimerStore.getVolumeExtend(this))
+                    "setVolumeExtend" -> {
+                        val enabled = call.argument<Boolean>("enabled")
+                        if (enabled == null) {
+                            result.error("INVALID", "Missing enabled", null)
+                        } else {
+                            TimerStore.saveVolumeExtend(this, enabled)
+                            result.success(null)
+                        }
+                    }
                     "openExactAlarmSettings" -> {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                             startActivity(

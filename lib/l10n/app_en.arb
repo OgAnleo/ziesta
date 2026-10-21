@@ -18,6 +18,9 @@
   "themeLight": "Light",
   "themeDark": "Dark",
   "defaultDuration": "Default duration",
+  "extendAmount": "Extend amount",
+  "volumeExtend": "Extend with volume button",
+  "volumeExtendHint": "During the last minute, press volume up to add more time.",
   "pausesAt": "Pauses at {time}",
   "@pausesAt": {
     "placeholders": {

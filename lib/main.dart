@@ -5,17 +5,23 @@ import 'package:ziesta/core/audio_channel.dart';
 
 import 'app.dart';
 import 'core/preferences_provider.dart';
+import 'features/settings/settings_notifier.dart';
 import 'features/timer/timer_notifier.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
-  final initialEnd = await AudioChannel().getEnd();
+  final channel = AudioChannel();
+  final initialEnd = await channel.getEnd();
+  final extendMinutes = await channel.getExtendMinutes();
+  final volumeExtend = await channel.getVolumeExtend();
   runApp(
     ProviderScope(
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
         initialTimerEndProvider.overrideWithValue(initialEnd),
+        initialExtendMinutesProvider.overrideWithValue(extendMinutes),
+        initialVolumeExtendProvider.overrideWithValue(volumeExtend),
       ],
       child: const ZiestaApp(),
     ),
