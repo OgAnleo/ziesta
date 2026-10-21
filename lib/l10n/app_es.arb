@@ -17,5 +17,11 @@
   "theme": "Tema",
   "themeLight": "Claro",
   "themeDark": "Oscuro",
-  "defaultDuration": "Duración por defecto"
+  "defaultDuration": "Duración por defecto",
+  "pausesAt": "Se pausará a las {time}",
+  "@pausesAt": {
+    "placeholders": {
+      "time": { "type": "String" }
+    }
+  }
 }

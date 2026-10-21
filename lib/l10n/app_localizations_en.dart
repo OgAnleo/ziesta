@@ -50,4 +50,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get defaultDuration => 'Default duration';
+
+  @override
+  String pausesAt(String time) {
+    return 'Pauses at $time';
+  }
 }

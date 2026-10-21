@@ -175,6 +175,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Default duration'**
   String get defaultDuration;
+
+  /// No description provided for @pausesAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Pauses at {time}'**
+  String pausesAt(String time);
 }
 
 class _AppLocalizationsDelegate

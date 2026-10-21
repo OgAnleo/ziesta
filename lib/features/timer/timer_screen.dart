@@ -64,14 +64,30 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
     );
   }
 
-  Widget _preset(AppLocalizations l10n, int minutes) => OutlinedButton(
-    onPressed: () => _controller.animateToItem(
-      minutes - 1,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-    ),
-    child: Text(l10n.minutesButton(minutes)),
-  );
+  String _clock(DateTime time) =>
+      MaterialLocalizations.of(context).formatTimeOfDay(
+        TimeOfDay.fromDateTime(time),
+        alwaysUse24HourFormat: MediaQuery.alwaysUse24HourFormatOf(context),
+      );
+
+  Widget _preset(AppLocalizations l10n, int minutes) {
+    final scheme = Theme.of(context).colorScheme;
+    final selected = _minutes == minutes;
+    return OutlinedButton(
+      style: selected
+          ? OutlinedButton.styleFrom(
+              side: BorderSide(color: scheme.primary),
+              foregroundColor: scheme.primary,
+            )
+          : null,
+      onPressed: () => _controller.animateToItem(
+        minutes - 1,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      ),
+      child: Text(l10n.minutesButton(minutes)),
+    );
+  }
 
   Widget _wheel(AppLocalizations l10n) {
     final theme = Theme.of(context);
@@ -157,14 +173,23 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
     );
   }
 
-  Widget _runningView(AppLocalizations l10n, Duration remaining) {
-    final textTheme = Theme.of(context).textTheme;
+  Widget _runningView(AppLocalizations l10n, Duration remaining, DateTime end) {
+    final theme = Theme.of(context);
+    final textTheme = theme.textTheme;
+    final muted = theme.colorScheme.onSurfaceVariant;
+
     return Center(
+      key: const ValueKey('running'),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        spacing: 32,
         children: [
           Text(_format(remaining), style: textTheme.displayLarge),
+          const SizedBox(height: 12),
+          Text(
+            l10n.pausesAt(_clock(end)),
+            style: textTheme.titleMedium?.copyWith(color: muted),
+          ),
+          const SizedBox(height: 48),
           TextButton(
             onPressed: () => ref.read(timerEndProvider.notifier).cancel(),
             child: Text(l10n.cancel),
@@ -177,7 +202,11 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final remaining = ref.watch(remainingProvider).value;
+    final end = ref.watch(timerEndProvider);
+    final running = end != null;
+    final left =
+        ref.watch(remainingProvider).value ??
+        (end?.difference(DateTime.now()) ?? Duration.zero);
 
     ref.listen(defaultMinutesProvider, (_, minutes) {
       _controller.jumpToItem(minutes - 1);
@@ -201,8 +230,31 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Offstage(offstage: remaining != null, child: _idleView(l10n)),
-            if (remaining != null) _runningView(l10n, remaining),
+            IgnorePointer(
+              ignoring: running,
+              child: ExcludeSemantics(
+                excluding: running,
+                child: AnimatedOpacity(
+                  opacity: running ? 0 : 1,
+                  duration: const Duration(milliseconds: 400),
+                  curve: Curves.easeInOut,
+                  child: _idleView(l10n),
+                ),
+              ),
+            ),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 400),
+              transitionBuilder: (child, animation) => FadeTransition(
+                opacity: animation,
+                child: ScaleTransition(
+                  scale: Tween<double>(begin: 0.94, end: 1).animate(animation),
+                  child: child,
+                ),
+              ),
+              child: end == null
+                  ? const SizedBox.shrink(key: ValueKey('none'))
+                  : _runningView(l10n, left, end),
+            ),
           ],
         ),
       ),
@@ -210,7 +262,8 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
   }
 }
 
-String _format(Duration d) {
+String _format(Duration value) {
+  final d = value.isNegative ? Duration.zero : value;
   final h = d.inHours;
   final m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
   final s = d.inSeconds.remainder(60).toString().padLeft(2, '0');

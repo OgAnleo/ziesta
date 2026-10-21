@@ -20,6 +20,9 @@ Future<void> pumpApp(
       overrides: [
         sharedPreferencesProvider.overrideWithValue(prefs),
         audioChannelProvider.overrideWithValue(fake),
+        initialTimerEndProvider.overrideWithValue(
+          remaining == null ? null : DateTime.now().add(remaining),
+        ),
         remainingProvider.overrideWith((ref) => Stream.value(remaining)),
       ],
       child: const ZiestaApp(),
@@ -87,8 +90,7 @@ void main() {
     );
 
     expect(find.text('05:07'), findsOneWidget);
-    expect(find.text('Start'), findsNothing);
-
+    expect(find.text('Start').hitTestable(), findsNothing);
     await tester.tap(find.text('Cancel'));
     await tester.pumpAndSettle();
 
