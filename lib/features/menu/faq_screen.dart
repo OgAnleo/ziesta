@@ -20,6 +20,10 @@ class FaqScreen extends StatelessWidget {
       (l10n.faq7Q, l10n.faq7A),
       (l10n.faq8Q, l10n.faq8A),
       (l10n.faq9Q, l10n.faq9A),
+      (l10n.faq10Q, l10n.faq10A),
+      (l10n.faq11Q, l10n.faq11A),
+      (l10n.faq12Q, l10n.faq12A),
+      (l10n.faq13Q, l10n.faq13A),
     ];
 
     return Scaffold(

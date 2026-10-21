@@ -257,98 +257,146 @@ abstract class AppLocalizations {
   /// No description provided for @faq2Q.
   ///
   /// In en, this message translates to:
-  /// **'Why does it need the Alarms & reminders permission?'**
+  /// **'Which apps does it work with?'**
   String get faq2Q;
 
   /// No description provided for @faq2A.
   ///
   /// In en, this message translates to:
-  /// **'Without it, Android does not allow scheduling an alarm at an exact time and the audio could pause late. It is granted only once from the system settings.'**
+  /// **'Apps that respond to the Android media controls. It has been tested with the YouTube and Twitch apps; some players may ignore them.'**
   String get faq2A;
 
   /// No description provided for @faq3Q.
   ///
   /// In en, this message translates to:
-  /// **'What is the notification permission for?'**
+  /// **'Why does it ask for the Alarms & reminders permission?'**
   String get faq3Q;
 
   /// No description provided for @faq3A.
   ///
   /// In en, this message translates to:
-  /// **'To show the countdown with the extend and cancel buttons. If you deny it, the timer still works, just without the notification.'**
+  /// **'Without it, Android does not allow scheduling an alarm at an exact time and the audio could pause late. It is granted only once from the system settings.'**
   String get faq3A;
 
   /// No description provided for @faq4Q.
   ///
   /// In en, this message translates to:
-  /// **'Which apps does it work with?'**
+  /// **'What is the notification permission for?'**
   String get faq4Q;
 
   /// No description provided for @faq4A.
   ///
   /// In en, this message translates to:
-  /// **'Apps that respond to the Android media controls. It has been tested with the YouTube and Twitch apps; some players may ignore them.'**
+  /// **'To show the countdown with the extend and cancel buttons. If you deny it, the timer still works, just without the notification.'**
   String get faq4A;
 
   /// No description provided for @faq5Q.
   ///
   /// In en, this message translates to:
-  /// **'Why does the volume go down during the last minute?'**
+  /// **'How do I extend or cancel the timer?'**
   String get faq5Q;
 
   /// No description provided for @faq5A.
   ///
   /// In en, this message translates to:
-  /// **'So the audio fades out gradually instead of stopping abruptly. When the time is up, Ziesta pauses the audio and leaves the volume as it was.'**
+  /// **'From the notification, with its extend and cancel buttons, without opening the app. You can also cancel from the main screen, or extend with the volume button during the last minute.'**
   String get faq5A;
 
   /// No description provided for @faq6Q.
   ///
   /// In en, this message translates to:
-  /// **'How do I extend or cancel the timer?'**
+  /// **'Can I change how much time the extend button adds?'**
   String get faq6Q;
 
   /// No description provided for @faq6A.
   ///
   /// In en, this message translates to:
-  /// **'From the notification, with its extend and cancel buttons, without opening the app. You can also cancel from the main screen.'**
+  /// **'Yes. In Settings, under Extend amount, you can choose between 1 and 60 minutes. The notification button always shows the chosen amount.'**
   String get faq6A;
 
   /// No description provided for @faq7Q.
   ///
   /// In en, this message translates to:
-  /// **'What happens if I restart my phone?'**
+  /// **'Why does the volume go down during the last minute?'**
   String get faq7Q;
 
   /// No description provided for @faq7A.
   ///
   /// In en, this message translates to:
-  /// **'When the phone restarts, Android clears pending alarms, so the timer is cancelled and you would need to set it again.'**
+  /// **'So the audio fades out gradually instead of stopping abruptly. When the time is up, Ziesta pauses the audio and leaves the volume as it was.'**
   String get faq7A;
 
   /// No description provided for @faq8Q.
   ///
   /// In en, this message translates to:
-  /// **'Does Ziesta use the internet or collect data?'**
+  /// **'How do I extend the time with the volume button?'**
   String get faq8Q;
 
   /// No description provided for @faq8A.
   ///
   /// In en, this message translates to:
-  /// **'No. It works offline and does not collect or send any data.'**
+  /// **'While the volume is going down in the last minute, press volume up on your phone: the amount chosen in Settings is added and the volume goes back to what you had. You can turn it off in Settings, under Extend with volume button.'**
   String get faq8A;
 
   /// No description provided for @faq9Q.
   ///
   /// In en, this message translates to:
-  /// **'Why does Ziesta ask to be a device administrator?'**
+  /// **'How do I make the phone lock when the timer ends?'**
   String get faq9Q;
 
   /// No description provided for @faq9A.
   ///
   /// In en, this message translates to:
-  /// **'Only to lock the screen when the timer ends. It is optional: turn the switch off in Settings to remove it, which also lets you uninstall the app normally.'**
+  /// **'Turn on Lock screen when it ends in Settings. Android will ask you to turn on Ziesta as a device administrator. When the timer ends, Ziesta pauses the audio and locks the phone.'**
   String get faq9A;
+
+  /// No description provided for @faq10Q.
+  ///
+  /// In en, this message translates to:
+  /// **'Why does Ziesta ask to be a device administrator?'**
+  String get faq10Q;
+
+  /// No description provided for @faq10A.
+  ///
+  /// In en, this message translates to:
+  /// **'Only to be able to lock the screen, and only if you turn that option on. Ziesta uses no other administrator function: it cannot erase data or change your password.'**
+  String get faq10A;
+
+  /// No description provided for @faq11Q.
+  ///
+  /// In en, this message translates to:
+  /// **'How do I uninstall Ziesta if I turned on the screen lock?'**
+  String get faq11Q;
+
+  /// No description provided for @faq11A.
+  ///
+  /// In en, this message translates to:
+  /// **'While Ziesta is an administrator, Android does not allow uninstalling it. Turn off Lock screen when it ends in Settings, or remove its permission in your phone settings (Security, Device administrators), and then uninstall it normally.'**
+  String get faq11A;
+
+  /// No description provided for @faq12Q.
+  ///
+  /// In en, this message translates to:
+  /// **'What happens if I restart my phone?'**
+  String get faq12Q;
+
+  /// No description provided for @faq12A.
+  ///
+  /// In en, this message translates to:
+  /// **'When the phone restarts, Android clears pending alarms, so the timer is cancelled and you would need to set it again.'**
+  String get faq12A;
+
+  /// No description provided for @faq13Q.
+  ///
+  /// In en, this message translates to:
+  /// **'Does Ziesta use the internet or collect data?'**
+  String get faq13Q;
+
+  /// No description provided for @faq13A.
+  ///
+  /// In en, this message translates to:
+  /// **'No. It works offline and does not collect or send any data.'**
+  String get faq13A;
 }
 
 class _AppLocalizationsDelegate
