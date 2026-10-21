@@ -1,45 +1,110 @@
 # Ziesta
 
-App móvil (Flutter/Dart) con temporizador de sueño: pausa el audio/vídeo
-(YouTube, Twitch, navegador...) a la hora marcada. Android primero (Samsung SM-A566B).
-La v1 es solo el temporizador, pero la estructura debe permitir crecer a una app completa.
+Android sleep timer built with Flutter. When the time runs out it pauses the audio of other
+apps (YouTube, Twitch...), after a gradual volume fade during the last minute.
+Android only (`--platforms=android`, minSdk 26), package `com.oscaranleo.ziesta`.
 
-## Stack
-- Flutter/Dart + Kotlin nativo (canal Kotlin-Dart) para alarma, audio focus y notificaciones
-- Sin paquetes externos si se puede hacer simple en Kotlin
-- Gestor de estado: Riverpod
-- Interfaz en español e inglés (.arb en lib/l10n)
-- Paquete Android: com.oscaranleo.ziesta
+## Working style
 
-## Estructura
-- lib/main.dart, lib/app.dart: arranque y configuración
-- lib/core/audio_channel.dart: canal Dart <-> Kotlin
-- lib/features/timer/: timer_notifier.dart (estado/lógica) y timer_screen.dart (UI)
-- lib/l10n/: app_es.arb y app_en.arb se editan a mano; app_localizations*.dart son generados, no tocar
-- android/app/src/main/kotlin/com/oscaranleo/: MediaPauser.kt
-- android/app/src/main/kotlin/com/oscaranleo/ziesta/: MainActivity, TimerScheduler, TimerReceiver, WarningReceiver
-- Cada función nueva va en su propia carpeta dentro de lib/features/
+- Reply to the user in Spanish. Git commit messages in English, imperative ("Add ...").
+- The user is learning Dart/Flutter and Kotlin: briefly explain any new syntax or concept
+  and why it is done that way. Do not assume Dart knowledge.
+- Go step by step and keep changes small: only touch what is needed, no unrequested features,
+  dependencies or refactors. Prefer simple, maintainable solutions over clever ones.
+- If the user makes a mistake, say so directly and fix it.
+- Never ask for, print or commit passwords, `key.properties` or `.jks` files.
 
-## Estado actual
-- Hecho: alarma que pausa el audio, persistencia de la hora de fin, cuenta atrás,
-  rueda de minutos con presets (10/20/30/60), permiso de alarmas,
-  aviso con notificación 1 min antes
-- Pendiente: prueba larga de 30 min en el Samsung
-- Decidido: NO añadir bloqueo de pantalla al terminar el tiempo (de momento)
-- Conocido: audio focus pausa YouTube pero no Twitch
+## Commands
 
-## Comandos
-- `flutter run` / `flutter analyze` / `flutter test`
+```
+flutter pub get
+flutter gen-l10n          # after editing .arb files; then run dart format .
+flutter run               # debug on the connected phone
+flutter run --release     # release behaviour (R8, no DEBUG banner)
+dart format .
+flutter analyze           # must report: No issues found!
+flutter test              # 11 tests: 7 notifier + 4 screen
+flutter build apk --release
+```
 
-## Cómo trabajar conmigo
-- Soy estudiante de DAM; sé Java, casi nada de Dart/Flutter ni Kotlin
-- Explica brevemente la sintaxis y conceptos nuevos de Dart y por qué se hace así
-- Avanza paso a paso y comprueba cada parte antes de seguir; nada de 200 líneas de golpe
-- Cambia solo el código necesario: no reescribas archivos enteros ni repitas lo que ya funciona
-- No añadas funcionalidades, dependencias ni refactors que no te pida
-- Si falta información imprescindible, pregunta antes de asumir
-- Si hago algo mal, dímelo directamente y corrígelo
-- Soluciones simples y mantenibles; arquitectura profesional pero sin sobreingeniería
-- Lee solo los archivos estrictamente necesarios
-- Mensajes de commit de Git en inglés
-- Respuestas concisas
+Before every commit: `dart format .`, `flutter analyze`, `flutter test`. CI
+(`.github/workflows/ci.yml`) runs the same checks plus a format check.
+
+Kotlin / manifest / resource changes need a full restart (`q`, then `flutter run`);
+Dart-only changes work with hot reload (`r`) or hot restart (`R`).
+
+## Architecture
+
+Two layers talking through one `MethodChannel` named `ziesta/audio`.
+
+**Dart (`lib/`)**
+- `main.dart`: initializes `SharedPreferences` and reads the native end time before `runApp`
+  (overrides `sharedPreferencesProvider` and `initialTimerEndProvider`).
+- `app.dart`: `MaterialApp`, themes, localization.
+- `core/audio_channel.dart`: Dart side of the channel (`scheduleTimer`, `cancelTimer`,
+  `getEnd`, `openExactAlarmSettings`, `requestNotificationPermission`).
+- `core/preferences_provider.dart`, `core/app_theme.dart` (minimalist dark theme).
+- `features/timer/`: `timer_notifier.dart` (Riverpod: `timerEndProvider`,
+  `remainingProvider`), `timer_screen.dart` (wheel 1-180 min, quick buttons 10/20/30/60,
+  countdown view with transitions).
+- `features/settings/`: theme mode (light/dark only, dark by default) and default duration,
+  stored in `shared_preferences` (`theme_mode`, `default_minutes`).
+- `l10n/`: `app_es.arb` is the template, `app_en.arb` the English copy. `l10n.yaml` is in the
+  project root. Every key must exist in both files.
+
+**Kotlin (`android/app/src/main/kotlin/com/oscaranleo/ziesta/`)**
+- `MainActivity`: channel handler; awaits the notification permission result.
+- `TimerScheduler`: exact alarms (`setExactAndAllowWhileIdle`): end alarm -> `TimerReceiver`
+  (request code 0), fade alarm at end - 60 s -> `FadeService` (request code 1).
+  `EXTEND_MILLIS` must be `15 * 60_000L` in committed code.
+- `TimerStore`: owns the end time (native `SharedPreferences` `ziesta_timer`).
+- `TimerReceiver`: pauses audio (`MediaPauser`: audio focus + `KEYCODE_MEDIA_PAUSE`), clears
+  the store, hides the notification, restores the volume 1.5 s later (`goAsync`).
+- `FadeService`: `shortService` foreground service that lowers the music volume every second;
+  `VolumeFader` saves/restores the original volume.
+- `TimerNotification`: ongoing, silent notification (low-importance channel `ziesta_timer`)
+  with a system-drawn countdown and two actions: `ExtendReceiver` (+15 min) and
+  `CancelReceiver`.
+
+**Key decision**: the native side is the single source of truth for the end time, so the
+notification buttons work with the app closed. Dart only asks for it (`getEnd`) at startup and
+every second while a countdown is visible (`TimerEndNotifier.refresh`). The Dart countdown
+never cancels native alarms when it reaches zero.
+
+## Tests
+
+`test/helpers/fake_audio_channel.dart` replaces the native channel. Tests override
+`audioChannelProvider`, `initialTimerEndProvider`, `sharedPreferencesProvider` and, in screen
+tests, `remainingProvider` (avoids pending timers). Tests run in English.
+
+## Release
+
+- Signed with `android/key.properties` + a keystore stored outside the repo (both ignored by
+  Git). If `key.properties` is missing, Gradle silently falls back to the debug key.
+- R8 (`isMinifyEnabled`, `isShrinkResources`) is disabled for release: with it on, the
+  `shared_preferences` plugin crashed at startup with `NoSuchMethodError`.
+- Debug and release APKs have different signatures: uninstall before switching.
+- APK is published through GitHub Releases (`ziesta-1.0.0.apk`, tag `v1.0.0`).
+- Check the signer with `apksigner verify --print-certs` (needs `JAVA_HOME` pointing to
+  Android Studio's `jbr`).
+
+## Gotchas
+
+- Windows + Gradle: the project path must be ASCII only (no accents).
+- Git on Windows ignores case-only renames: use `git mv a tmp && git mv tmp a`. README
+  screenshots live in `docs/screenshots/` with lowercase names (GitHub is case sensitive).
+- `flutter gen-l10n` rewrites `lib/l10n/app_localizations*.dart`: always run `dart format .`
+  afterwards or the CI format check fails.
+- When the user pastes code, make sure each snippet goes into the file with the matching name.
+
+## Known limitations
+
+- Rebooting the phone cancels the pending alarm (accepted, not planned).
+- Tested with the YouTube and Twitch apps only.
+- The fade changes the system media volume and restores it afterwards.
+
+## Not done yet
+
+- Google Play: needs a privacy policy, an app bundle (`flutter build appbundle`), the exact
+  alarm permission declaration, and for a new personal account a closed test (12 testers,
+  14 days). Check Google's current requirements first.
