@@ -9,6 +9,7 @@ class FakeAudioChannel extends Fake implements AudioChannel {
   int settingsOpened = 0;
   DateTime? lastEnd;
   DateTime? nativeEnd;
+  final sharedTexts = <String>[];
 
   @override
   Future<bool> scheduleTimer(DateTime end) async {
@@ -36,5 +37,10 @@ class FakeAudioChannel extends Fake implements AudioChannel {
   @override
   Future<void> openExactAlarmSettings() async {
     settingsOpened++;
+  }
+
+  @override
+  Future<void> shareText(String text) async {
+    sharedTexts.add(text);
   }
 }

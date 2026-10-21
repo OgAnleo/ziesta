@@ -59,6 +59,19 @@ class MainActivity : FlutterActivity() {
                             result.success(true)
                         }
                     }
+                    "shareText" -> {
+                        val text = call.argument<String>("text")
+                        if (text == null) {
+                            result.error("INVALID", "Missing text", null)
+                        } else {
+                            val send = Intent(Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(Intent.EXTRA_TEXT, text)
+                            }
+                            startActivity(Intent.createChooser(send, null))
+                            result.success(null)
+                        }
+                    }
                     else -> result.notImplemented()
                 }
             }

@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:ziesta/app.dart';
+import 'package:ziesta/core/app_links.dart';
 import 'package:ziesta/core/preferences_provider.dart';
 import 'package:ziesta/features/timer/timer_notifier.dart';
 
@@ -95,5 +96,31 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(fake.cancelCalls, 1);
+  });
+
+  testWidgets('the menu opens the FAQ', (tester) async {
+    await pumpApp(tester, fake);
+
+    await tester.tap(find.byTooltip('Menu'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('FAQ'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('HELP'), findsOneWidget);
+    expect(
+      find.text('Does it work with the screen off or the app closed?'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('the menu shares the releases link', (tester) async {
+    await pumpApp(tester, fake);
+
+    await tester.tap(find.byTooltip('Menu'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Share the app'));
+    await tester.pumpAndSettle();
+
+    expect(fake.sharedTexts.single, contains(releasesUrl));
   });
 }

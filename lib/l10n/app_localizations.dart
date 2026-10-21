@@ -181,6 +181,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pauses at {time}'**
   String pausesAt(String time);
+
+  /// No description provided for @menu.
+  ///
+  /// In en, this message translates to:
+  /// **'Menu'**
+  String get menu;
+
+  /// No description provided for @shareApp.
+  ///
+  /// In en, this message translates to:
+  /// **'Share the app'**
+  String get shareApp;
+
+  /// No description provided for @faq.
+  ///
+  /// In en, this message translates to:
+  /// **'FAQ'**
+  String get faq;
+
+  /// No description provided for @helpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Help'**
+  String get helpTitle;
+
+  /// No description provided for @shareMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Ziesta is a sleep timer that pauses the audio of other apps. Download it here: {url}'**
+  String shareMessage(String url);
+
+  /// No description provided for @faq1Q.
+  ///
+  /// In en, this message translates to:
+  /// **'Does it work with the screen off or the app closed?'**
+  String get faq1Q;
+
+  /// No description provided for @faq1A.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes. Android itself manages the timer with an exact alarm, so it keeps running even if you close the app or turn the screen off.'**
+  String get faq1A;
+
+  /// No description provided for @faq2Q.
+  ///
+  /// In en, this message translates to:
+  /// **'Why does it need the Alarms & reminders permission?'**
+  String get faq2Q;
+
+  /// No description provided for @faq2A.
+  ///
+  /// In en, this message translates to:
+  /// **'Without it, Android does not allow scheduling an alarm at an exact time and the audio could pause late. It is granted only once from the system settings.'**
+  String get faq2A;
+
+  /// No description provided for @faq3Q.
+  ///
+  /// In en, this message translates to:
+  /// **'What is the notification permission for?'**
+  String get faq3Q;
+
+  /// No description provided for @faq3A.
+  ///
+  /// In en, this message translates to:
+  /// **'To show the countdown with the extend and cancel buttons. If you deny it, the timer still works, just without the notification.'**
+  String get faq3A;
+
+  /// No description provided for @faq4Q.
+  ///
+  /// In en, this message translates to:
+  /// **'Which apps does it work with?'**
+  String get faq4Q;
+
+  /// No description provided for @faq4A.
+  ///
+  /// In en, this message translates to:
+  /// **'Apps that respond to the Android media controls. It has been tested with the YouTube and Twitch apps; some players may ignore them.'**
+  String get faq4A;
+
+  /// No description provided for @faq5Q.
+  ///
+  /// In en, this message translates to:
+  /// **'Why does the volume go down during the last minute?'**
+  String get faq5Q;
+
+  /// No description provided for @faq5A.
+  ///
+  /// In en, this message translates to:
+  /// **'So the audio fades out gradually instead of stopping abruptly. When the time is up, Ziesta pauses the audio and leaves the volume as it was.'**
+  String get faq5A;
+
+  /// No description provided for @faq6Q.
+  ///
+  /// In en, this message translates to:
+  /// **'How do I extend or cancel the timer?'**
+  String get faq6Q;
+
+  /// No description provided for @faq6A.
+  ///
+  /// In en, this message translates to:
+  /// **'From the notification, with its extend and cancel buttons, without opening the app. You can also cancel from the main screen.'**
+  String get faq6A;
+
+  /// No description provided for @faq7Q.
+  ///
+  /// In en, this message translates to:
+  /// **'What happens if I restart my phone?'**
+  String get faq7Q;
+
+  /// No description provided for @faq7A.
+  ///
+  /// In en, this message translates to:
+  /// **'When the phone restarts, Android clears pending alarms, so the timer is cancelled and you would need to set it again.'**
+  String get faq7A;
+
+  /// No description provided for @faq8Q.
+  ///
+  /// In en, this message translates to:
+  /// **'Does Ziesta use the internet or collect data?'**
+  String get faq8Q;
+
+  /// No description provided for @faq8A.
+  ///
+  /// In en, this message translates to:
+  /// **'No. It works offline and does not collect or send any data.'**
+  String get faq8A;
 }
 
 class _AppLocalizationsDelegate

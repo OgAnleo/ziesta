@@ -23,7 +23,7 @@ flutter run               # debug on the connected phone
 flutter run --release     # release behaviour (R8, no DEBUG banner)
 dart format .
 flutter analyze           # must report: No issues found!
-flutter test              # 11 tests: 7 notifier + 4 screen
+flutter test              # 13 tests: 7 notifier + 6 screen
 flutter build apk --release
 ```
 

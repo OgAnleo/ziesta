@@ -32,4 +32,7 @@ class AudioChannel {
     );
     return granted ?? false;
   }
+
+  Future<void> shareText(String text) =>
+      _channel.invokeMethod<void>('shareText', {'text': text});
 }

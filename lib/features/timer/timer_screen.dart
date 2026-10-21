@@ -5,6 +5,7 @@ import 'package:ziesta/features/settings/settings_notifier.dart';
 import 'package:ziesta/features/settings/settings_screen.dart';
 import 'package:ziesta/features/timer/timer_notifier.dart';
 import 'package:ziesta/l10n/app_localizations.dart';
+import 'package:ziesta/features/menu/app_menu.dart';
 
 class TimerScreen extends ConsumerStatefulWidget {
   const TimerScreen({super.key});
@@ -224,6 +225,7 @@ class _TimerScreenState extends ConsumerState<TimerScreen> {
               MaterialPageRoute<void>(builder: (_) => const SettingsScreen()),
             ),
           ),
+          const AppMenu(),
         ],
       ),
       body: SafeArea(

@@ -23,5 +23,31 @@
     "placeholders": {
       "time": { "type": "String" }
     }
-  }
+  },
+    "menu": "Menú",
+  "shareApp": "Compartir la app",
+  "faq": "Preguntas frecuentes",
+  "helpTitle": "Ayuda",
+  "shareMessage": "Ziesta es un temporizador de sueño que pausa el audio de otras apps. Descárgala aquí: {url}",
+  "@shareMessage": {
+    "placeholders": {
+      "url": { "type": "String" }
+    }
+  },
+  "faq1Q": "¿Funciona con la pantalla apagada o con la app cerrada?",
+  "faq1A": "Sí. El temporizador lo gestiona el propio Android con una alarma exacta, así que sigue en marcha aunque cierres la app o apagues la pantalla.",
+  "faq2Q": "¿Por qué pide el permiso «Alarmas y recordatorios»?",
+  "faq2A": "Sin él, Android no permite programar una alarma a la hora exacta y el audio podría pausarse con retraso. Se concede una sola vez desde los ajustes del sistema.",
+  "faq3Q": "¿Para qué sirve el permiso de notificaciones?",
+  "faq3A": "Para mostrar la cuenta atrás con los botones de ampliar y cancelar. Si lo deniegas, el temporizador funciona igual, pero sin notificación.",
+  "faq4Q": "¿Con qué apps funciona?",
+  "faq4A": "Con las que responden a los controles multimedia de Android. Está probado con las apps de YouTube y Twitch; algunos reproductores pueden ignorarlos.",
+  "faq5Q": "¿Por qué baja el volumen en el último minuto?",
+  "faq5A": "Para que el audio se apague poco a poco y no de golpe. Al terminar, Ziesta pausa el audio y deja el volumen como estaba.",
+  "faq6Q": "¿Cómo amplío o cancelo el temporizador?",
+  "faq6A": "Desde la notificación, con sus botones de ampliar y cancelar, sin abrir la app. También puedes cancelar desde la pantalla principal.",
+  "faq7Q": "¿Qué pasa si reinicio el móvil?",
+  "faq7A": "Al reiniciar, Android borra las alarmas pendientes, así que el temporizador se cancela y habría que programarlo de nuevo.",
+  "faq8Q": "¿Ziesta usa internet o recoge datos?",
+  "faq8A": "No. Funciona sin conexión y no recoge ni envía ningún dato."
 }
