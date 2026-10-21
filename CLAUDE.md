@@ -20,10 +20,10 @@ Android only (`--platforms=android`, minSdk 26), package `com.oscaranleo.ziesta`
 flutter pub get
 flutter gen-l10n          # after editing .arb files; then run dart format .
 flutter run               # debug on the connected phone
-flutter run --release     # release behaviour (R8, no DEBUG banner)
+flutter run --release     # release behaviour (no DEBUG banner)
 dart format .
 flutter analyze           # must report: No issues found!
-flutter test              # 25 tests: 7 notifier + 6 screen + 9 settings notifier + 3 settings screen
+flutter test              # 13 tests: 7 notifier + 4 screen + 2 menu
 flutter build apk --release
 ```
 
@@ -38,53 +38,45 @@ Dart-only changes work with hot reload (`r`) or hot restart (`R`).
 Two layers talking through one `MethodChannel` named `ziesta/audio`.
 
 **Dart (`lib/`)**
-- `main.dart`: initializes `SharedPreferences` and reads the native end time before `runApp`
-  (overrides `sharedPreferencesProvider` and `initialTimerEndProvider`).
+- `main.dart`: initializes `SharedPreferences` and reads the native end time and the
+  timer settings before `runApp` (overrides `sharedPreferencesProvider` and
+  `initialTimerEndProvider`).
 - `app.dart`: `MaterialApp`, themes, localization.
-- `core/audio_channel.dart`: Dart side of the channel (`scheduleTimer`, `cancelTimer`,
-  `getEnd`, `getExtendMinutes`, `setExtendMinutes`, `getVolumeExtend`, `setVolumeExtend`,
-  `openExactAlarmSettings`,
-  `requestNotificationPermission`, `shareText`, and the lock-screen ones: `isLockAdminActive`,
-  `requestLockAdmin`, `removeLockAdmin`, `getLockOnEnd`, `setLockOnEnd`).
-- `core/preferences_provider.dart`, `core/app_theme.dart` (minimalist dark theme).
+- `core/audio_channel.dart`: Dart side of the channel (schedule/cancel/`getEnd`, exact alarm
+  settings, notification permission, `shareText`, extend amount, volume-extend and lock
+  settings).
+- `core/preferences_provider.dart`, `core/app_theme.dart` (minimalist dark theme),
+  `core/app_links.dart` (`releasesUrl`, used by Share).
 - `features/timer/`: `timer_notifier.dart` (Riverpod: `timerEndProvider`,
   `remainingProvider`), `timer_screen.dart` (wheel 1-180 min, quick buttons 10/20/30/60,
-  countdown view with transitions).
-- `features/settings/`: theme mode (light/dark only, dark by default), default duration
-  (stored in `shared_preferences`: `theme_mode`, `default_minutes`) and extend amount
-  (slider 1-60 min, default 15, saved on release) and the "extend with volume button" switch (default on). Both are
-  native-owned and read in `main()` via `initialExtendMinutesProvider` / `initialVolumeExtendProvider`.
-  The "lock screen when it ends" switch (`lockOnEndProvider`, default off) is read in `main()` as
-  stored value AND admin active (`initialLockOnEndProvider`); the settings screen calls `refresh()`
-  when opened so a revoked admin shows OFF. Turning it on only sticks if the user accepts the
-  system activation screen.
+  countdown view with transitions, settings and menu buttons in the AppBar).
+- `features/settings/`: theme mode (light/dark only, dark by default), default duration,
+  extend amount (1-60 min slider), extend with volume button (on by default) and lock screen
+  when it ends (off by default).
+- `features/menu/`: `app_menu.dart` (Share the app, FAQ) and `faq_screen.dart` (13 questions).
 - `l10n/`: `app_es.arb` is the template, `app_en.arb` the English copy. `l10n.yaml` is in the
   project root. Every key must exist in both files.
 
 **Kotlin (`android/app/src/main/kotlin/com/oscaranleo/ziesta/`)**
-- `MainActivity`: channel handler; awaits the notification permission result.
+- `MainActivity`: channel handler; awaits the notification permission result; `shareText`
+  opens the Android share sheet.
 - `TimerScheduler`: exact alarms (`setExactAndAllowWhileIdle`): end alarm -> `TimerReceiver`
-  (request code 0), fade alarm at end - 60 s -> `FadeService` (request code 1).
-  The extend amount comes from `TimerStore`, not a constant.
-- `TimerStore`: owns the end time, `extend_minutes` and `volume_extend` (native `SharedPreferences` `ziesta_timer`).
+  (request code 0), fade alarm at end - 60 s -> `FadeService` (request code 1). The extend
+  amount is configurable (read from `TimerStore`).
+- `TimerStore`: owns the end time and the timer settings (native `SharedPreferences`
+  `ziesta_timer`).
 - `TimerReceiver`: pauses audio (`MediaPauser`: audio focus + `KEYCODE_MEDIA_PAUSE`), clears
-  the store, hides the notification, restores the volume 1.5 s later (`goAsync`).
-- `FadeService`: `shortService` foreground service that lowers the music volume every second;
-  `VolumeFader` saves/restores the original volume. If `volume_extend` is on, it also listens
-  for `VOLUME_CHANGED_ACTION`: a STREAM_MUSIC increase (value > previous) is the user and extends
-  the timer; `VolumeFader.restore` sets `ignoreIncreasesUntil` (1.5 s) so our own restore is ignored.
-- Lock screen (optional, **isolated and removable**): `LockAdminReceiver` (empty
-  `DeviceAdminReceiver`), `LockController` (`isActive`, `requestActivation`, `remove`,
-  `lockIfEnabled`), `res/xml/device_admin.xml` (only `<force-lock/>`), the manifest `<receiver>`
-  and the `lock_admin_explanation` strings. `TimerReceiver` calls `lockIfEnabled` right after
-  `MediaPauser.pause`; it calls `lockNow()` only if `lock_on_end` (in `TimerStore`) is on AND the
-  admin is active. `MainActivity` awaits the activation screen in `onActivityResult`. To remove
-  the feature, delete those files/entries plus the calls in `MainActivity`, `TimerReceiver`,
-  `TimerStore` and the Dart switch/notifier/FAQ 9. While Ziesta is admin it cannot be uninstalled,
-  hence turning the switch off calls `removeActiveAdmin`.
+  the store, hides the notification, restores the volume 1.5 s later (`goAsync`), then calls
+  `LockController.lockIfEnabled`.
+- `FadeService`: `shortService` foreground service that lowers the music volume every second
+  and, if enabled, listens for volume-up presses to extend the timer; `VolumeFader`
+  saves/restores the original volume. If the volume-change broadcast proves unreliable on
+  some devices, the fallback idea is a `ContentObserver`.
 - `TimerNotification`: ongoing, silent notification (low-importance channel `ziesta_timer`)
-  with a system-drawn countdown and two actions: `ExtendReceiver` (+N min, label from the stored extend amount) and
+  with a system-drawn countdown and two actions: `ExtendReceiver` (+N min) and
   `CancelReceiver`.
+- Screen lock (kept in separate files so it can be removed): `LockAdminReceiver`,
+  `LockController`, `res/xml/device_admin.xml` (only `<force-lock/>`).
 
 **Key decision**: the native side is the single source of truth for the end time, so the
 notification buttons work with the app closed. Dart only asks for it (`getEnd`) at startup and
@@ -104,7 +96,8 @@ tests, `remainingProvider` (avoids pending timers). Tests run in English.
 - R8 (`isMinifyEnabled`, `isShrinkResources`) is disabled for release: with it on, the
   `shared_preferences` plugin crashed at startup with `NoSuchMethodError`.
 - Debug and release APKs have different signatures: uninstall before switching.
-- APK is published through GitHub Releases (`ziesta-1.0.0.apk`, tag `v1.0.0`).
+- APK is published through GitHub Releases (`ziesta-<version>.apk`, tag `v<version>`);
+  current: `v1.1.0`. Bump `version:` in `pubspec.yaml` first.
 - Check the signer with `apksigner verify --print-certs` (needs `JAVA_HOME` pointing to
   Android Studio's `jbr`).
 
@@ -122,12 +115,13 @@ tests, `remainingProvider` (avoids pending timers). Tests run in English.
 - Rebooting the phone cancels the pending alarm (accepted, not planned).
 - Tested with the YouTube and Twitch apps only.
 - The fade changes the system media volume and restores it afterwards.
+- Extending with the volume button depends on how the device reports volume changes.
+- With the lock option on, Ziesta is a device administrator and cannot be uninstalled until
+  the option is turned off.
 
 ## Not done yet
 
 - Google Play: needs a privacy policy, an app bundle (`flutter build appbundle`), the exact
-  alarm permission declaration, and for a new personal account a closed test (12 testers,
-  14 days). Check Google's current requirements first.
-- Google Play caveat: Play restricts the Device Admin API (it must be core functionality and
-  declared/justified in review). Locking the screen is likely not core, so this feature may need
-  to be removed (see "isolated and removable") before publishing there; the GitHub APK is fine.
+  alarm permission declaration, a decision about the Device Admin option (review risk), and
+  for a new personal account a closed test (12 testers, 14 days). Check Google's current
+  requirements first.
